@@ -21,8 +21,13 @@ var app = express();
 var cors = require('cors');
 
 
-app.use(cors());
+const corsConfig = {
+  origin: true,
+  credentials: true
+};
 
+app.use(cors());
+// app.options("*", cors(corsConfig));
 
 app.use("/",indexRouter,  function (req, res, next) {
   res.setHeader('Access-Control-Allow-Origin', '*');
@@ -43,7 +48,8 @@ var mongoose = require('mongoose');
 //Set up default mongoose connection
 //var mongoDB = "mongodb+srv://shtaro:turAYR3011@cluster0-lk8r9.mongodb.net/test?retryWrites=true&w=majority";
 var mongoDB = "mongodb://localhost:27017/modamedicDB";
-mongoose.connect(mongoDB,  { useNewUrlParser: true });
+var mongoNoyUrl = "mongodb+srv://noyharari:noyharari@cluster0.vldcb.mongodb.net/modamedicDB?retryWrites=true&w=majority";
+mongoose.connect(mongoNoyUrl,  { useNewUrlParser: true });
 // Get Mongoose to use the global promise library
 mongoose.Promise = global.Promise;
 //Get the default connection
@@ -70,7 +76,7 @@ app.use(express.static(path.join(__dirname, 'public')));
 app.use('/users', usersRouter);
 app.use('/auth/usersAll', usersAllRouter);
 app.use('/questionnaires', questionnairesRouter);
-app.use('/auth/patients/metrics', metricsPatientRouter);
+app.use('/auth/patients`/metrics', metricsPatientRouter);
 app.use('/auth/doctors/metrics', metricsDoctorRouter);
 app.use('/auth/patients/answers', answersPatientRouter);
 app.use('/auth/doctors/answers', answersDoctorRouter);

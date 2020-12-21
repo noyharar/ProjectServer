@@ -11,8 +11,8 @@ var https = require('https');
 var fs = require('fs');
 
 var httpsOptions = {
-  key: fs.readFileSync("C:\\Users\\User\\WebstormProjects\\ModaMedicServer\\key.pem"),
-  cert: fs.readFileSync("C:\\Users\\User\\WebstormProjects\\ModaMedicServer\\cert.pem")
+  key: fs.readFileSync("C:\\Users\\noyha\\IdeaProjects\\ProjectServer\\key.pem"),
+  cert: fs.readFileSync("C:\\Users\\noyha\\IdeaProjects\\ProjectServer\\cert.pem")
 };
 
 /**
@@ -26,7 +26,7 @@ app.set('port', port);
  * Create HTTP server.
  */
 
-var server = https.createServer(httpsOptions, app);
+var server = http.createServer(httpsOptions, app);
 
 /**
  * Listen on provided port, on all network interfaces.
