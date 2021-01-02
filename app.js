@@ -16,6 +16,7 @@ var metricsPatientRouter = require('./routes/metrics/metricsPatient');
 var answersPatientRouter = require('./routes/answers/answersPatient');
 var answersDoctorRouter = require('./routes/answers/answersDoctor');
 var requestsDoctorRouter = require('./routes/permissionRequests/permissionRequestsDoctor');
+var DestinationsPatientRouter = require('./routes/PatientDestinations/patintesDestinations');
 
 var app = express();
 var cors = require('cors');
@@ -81,6 +82,7 @@ app.use('/auth/doctors/metrics', metricsDoctorRouter);
 app.use('/auth/patients/answers', answersPatientRouter);
 app.use('/auth/doctors/answers', answersDoctorRouter);
 app.use('/auth/doctors/permissionRequests', requestsDoctorRouter);
+app.use('/auth/patients/PatientDestinations', DestinationsPatientRouter);
 
 
 // catch 404 and forward to error handler
