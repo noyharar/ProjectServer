@@ -79,14 +79,14 @@ router.get('/getPatientProgress', async function (req, res) {
                 const update = await PatientsStepsLevel.update({_userID:userIdFound,RepeatsLeft:newCurrentRepeats})
                 console.log("Well Done you got your target!")
                 common(res, null, null, {
-                    targetDone: true,  inNewLevel: false, currentLevel:currentLevel,RepeatsLeft: newCurrentRepeats
+                    targetDone: true,  inNewLevel: false, currentLevel:currentLevel,repeatsLeft: newCurrentRepeats
                 });
             }// console.log("Well Done you got your target!")
         }
         else{
             console.log("you dont get your target")
             common(res, null, null, {
-                targetDone: false,  inNewLevel: false, currentLevel:currentLevel,RepeatsLeft: currentRepeats
+                targetDone: false,  inNewLevel: false, currentLevel:currentLevel,repeatsLeft: currentRepeats
             });
         }
 
