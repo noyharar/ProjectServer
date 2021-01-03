@@ -77,7 +77,7 @@ app.use(express.static(path.join(__dirname, 'public')));
 app.use('/users', usersRouter);
 app.use('/auth/usersAll', usersAllRouter);
 app.use('/questionnaires', questionnairesRouter);
-app.use('/auth/patients`/metrics', metricsPatientRouter);
+app.use('/auth/patients/metrics', metricsPatientRouter);
 app.use('/auth/doctors/metrics', metricsDoctorRouter);
 app.use('/auth/patients/answers', answersPatientRouter);
 app.use('/auth/doctors/answers', answersDoctorRouter);

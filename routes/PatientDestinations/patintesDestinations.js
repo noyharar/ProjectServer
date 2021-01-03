@@ -56,9 +56,9 @@ router.get('/getPatientProgress', async function (req, res) {
 
     let today = new Date();
     let lastDate = new Date(timeStepsDone)
-    // if(today.getFullYear() === lastDate.getFullYear() &&
-    //     today.getMonth() === lastDate.getMonth() &&
-    //     today.getDate() === lastDate.getDate()){
+    if(today.getFullYear() === lastDate.getFullYear() &&
+        today.getMonth() === lastDate.getMonth() &&
+        today.getDate() === lastDate.getDate()){
 
         if(currentSteps>=TargetDest){
             if(targetRepeats - currentRepeats === targetRepeats - 1){
@@ -91,10 +91,12 @@ router.get('/getPatientProgress', async function (req, res) {
             });
         }
 
-    // }
-    // else{
-    //     common(res, null, null, false);
-    // }
+    }
+    else{
+        common(res, null, null, {
+            targetDone: false,  inNewLevel: false, currentLevel:currentLevel,repeatsLeft: currentRepeats,stepsTarget:TargetDest
+        });
+    }
 
 
 });
