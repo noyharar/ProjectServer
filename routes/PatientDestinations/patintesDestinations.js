@@ -65,13 +65,14 @@ router.get('/getPatientProgress', async function (req, res) {
                 let newLevel = currentLevel + 1
                 const newTarget = await StepDestination.findOne({Level: newLevel}).lean().exec();
                 let newCurrentRepeats = newTarget.ExecutionNum
+                let newLevelTarget = newTarget.Target
 
                 const update = await PatientsStepsLevel.update({_userID:userIdFound,Level:newLevel,RepeatsLeft:newCurrentRepeats})//the new level
 
                 //return: target done: true, innNewLevel: true, current level: num, repeat left to next level: num
                 console.log("Well Done you got your target and level up!")
                 common(res, null, null, {
-                    targetDone: true,  inNewLevel: true, currentLevel:newLevel,repeatsLeft:newCurrentRepeats
+                    targetDone: true,  inNewLevel: true, currentLevel:newLevel,repeatsLeft:newCurrentRepeats,stepsTarget:newLevelTarget
                 });
             }
             else{
@@ -79,14 +80,14 @@ router.get('/getPatientProgress', async function (req, res) {
                 const update = await PatientsStepsLevel.update({_userID:userIdFound,RepeatsLeft:newCurrentRepeats})
                 console.log("Well Done you got your target!")
                 common(res, null, null, {
-                    targetDone: true,  inNewLevel: false, currentLevel:currentLevel,repeatsLeft: newCurrentRepeats
+                    targetDone: true,  inNewLevel: false, currentLevel:currentLevel,repeatsLeft: newCurrentRepeats,stepsTarget:TargetDest
                 });
             }// console.log("Well Done you got your target!")
         }
         else{
             console.log("you dont get your target")
             common(res, null, null, {
-                targetDone: false,  inNewLevel: false, currentLevel:currentLevel,repeatsLeft: currentRepeats
+                targetDone: false,  inNewLevel: false, currentLevel:currentLevel,repeatsLeft: currentRepeats,stepsTarget:TargetDest
             });
         }
 
