@@ -5,7 +5,6 @@ var common = require('./common');
 var jwt = require('jsonwebtoken');
 var tempToken = "password";
 
-
 router.get('/getFirsts', async function(req, res) {
   var allUsers = await User.find({Type: ["patient"]}).lean().exec();
   var ans = [];
@@ -141,5 +140,21 @@ router.post('/askChangePassword', async function (req, res) {
   });
 });
 
+router.get('/userInfo', async function(req, res) {
+  var userid = "";
+    userid = req.UserID;
+  let userObj = await User.findOne({UserID: req.UserID}).lean().exec();
+
+  await User.getUserByUserID(userid, function (err, user) {
+    if(err)
+      common(res, true, err, null);
+    else{
+      if(user)
+        common(res, false, null, user);
+      else
+        common(res, false, "Not Found", null);
+    }
+  });
+});
 
 module.exports = router;

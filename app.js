@@ -16,6 +16,9 @@ var metricsPatientRouter = require('./routes/metrics/metricsPatient');
 var answersPatientRouter = require('./routes/answers/answersPatient');
 var answersDoctorRouter = require('./routes/answers/answersDoctor');
 var requestsDoctorRouter = require('./routes/permissionRequests/permissionRequestsDoctor');
+var patientMessagesRouter = require('./routes/messages/patientsMessages');
+var doctorMessagesRouter = require('./routes/messages/doctorsMessages');
+var instructionsSurgeryRouter = require('./routes/instructions/patientsInstructions');
 
 var app = express();
 var cors = require('cors');
@@ -76,12 +79,14 @@ app.use(express.static(path.join(__dirname, 'public')));
 app.use('/users', usersRouter);
 app.use('/auth/usersAll', usersAllRouter);
 app.use('/questionnaires', questionnairesRouter);
-app.use('/auth/patients`/metrics', metricsPatientRouter);
+app.use('/auth/patients/metrics', metricsPatientRouter);
 app.use('/auth/doctors/metrics', metricsDoctorRouter);
 app.use('/auth/patients/answers', answersPatientRouter);
 app.use('/auth/doctors/answers', answersDoctorRouter);
 app.use('/auth/doctors/permissionRequests', requestsDoctorRouter);
-
+app.use('/auth/patients/messages', patientMessagesRouter);
+app.use('/auth/doctors/messages', doctorMessagesRouter);
+app.use('/auth/patients/instructions', instructionsSurgeryRouter);
 
 // catch 404 and forward to error handler
 app.use(function(req, res, next) {

@@ -4,6 +4,9 @@ var common = require('../common');
 var csv = require('csvtojson');
 var DailyAnswer = require('../../modules/Answer').DailyAnswer;
 var PeriodicAnswer = require('../../modules/Answer').PeriodicAnswer;
+var service = require('../../service');
+var User = require('../../modules/User');
+var Permission = require('../../modules/Permission');
 
 
 var getScore = async function (QuestionnaireID, Answers) {
@@ -124,5 +127,79 @@ router.get('/answeredQuestionnaire', async function (req, res) {
     }
 });
 
+
+var findUsers = async function(firstName, lastName, doctorID){
+    var usersID = [];
+    const leanDoc = await User.find({First_Name: firstName, Last_Name: lastName, Type:'patient'}).lean().exec();
+    for await (const user of leanDoc){
+        /**
+         var permission = await Permission.findOne({DoctorID: doctorID, PatientID: user.UserID}).lean().exec();
+         if(permission)
+         usersID.push({UserID: user.UserID, BirthDate: user.BirthDate, Permission: "yes"});
+         else
+         usersID.push({UserID: user.UserID, BirthDate: user.BirthDate, Permission: "no"});
+         **/
+        usersID.push(user);
+    }
+    return usersID;
+};
+
+router.get('/getDailyAnswers', async function (req, res, next) {
+    if (typeof (req.query.start_time) == 'undefined') {
+        req.query.start_time = 0;
+    }
+    if (typeof (req.query.end_time) == 'undefined') {
+        req.query.end_time = (new Date).getTime();
+    }
+    req.query.start_time = parseFloat(req.query.start_time);
+    req.query.end_time = parseFloat(req.query.end_time);
+    var ans = [];
+    let userObj = await User.findOne({UserID: req.UserID}).lean().exec();
+    var docs = await DailyAnswer.find({
+        UserID: req.UserID,
+        QuestionnaireID: 0,
+        ValidTime: {$gte: req.query.start_time, $lte: req.query.end_time}
+    }).lean().exec();
+    if (docs.length > 0) {
+        var onePerDay = await service.findMostRecent(docs, req.query.start_time, req.query.end_time);
+        ans.push({UserID: userObj, docs: onePerDay});
+    } else
+        ans.push({UserID: userObj, docs: docs});
+    common(res, null, null, ans);
+
+});
+
+router.get('/getPeriodicAnswers', async function (req, res, next) {
+    if (typeof (req.query.start_time) == 'undefined') {
+        req.query.start_time = 0;
+    }
+    if (typeof (req.query.end_time) == 'undefined') {
+        req.query.end_time = (new Date).getTime();
+    }
+    req.query.start_time = parseFloat(req.query.start_time);
+    req.query.end_time = parseFloat(req.query.end_time);
+        var ans = [];
+        var questionnaires = [];
+        let userObj = await User.findOne({UserID: req.UserID}).lean().exec();
+        questionnaires = userObj.Questionnaires;
+        for await (const quest of questionnaires){
+            if(quest.QuestionnaireID !== 0) {
+                var docs = await PeriodicAnswer.find({
+                    UserID: req.UserID,
+                    QuestionnaireID: quest.QuestionnaireID,
+                    ValidTime: {$gte: req.query.start_time, $lte: req.query.end_time}
+                }).lean().exec();
+                if (docs.length > 0) {
+                    var onePerDay = await service.findMostRecent(docs, req.query.start_time, req.query.end_time);
+                    let docs2 = {QuestionnaireID: quest.QuestionnaireID, data: onePerDay};
+                    ans.push({UserID: userObj, docs: docs2});
+                } else {
+                    let docs2 = {QuestionnaireID: quest.QuestionnaireID, data: docs};
+                    ans.push({UserID: userObj, docs: docs2});
+                }
+            }
+        }
+        common(res, null, null, ans);
+});
 
 module.exports = router;

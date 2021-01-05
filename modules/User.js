@@ -120,7 +120,7 @@ module.exports.doctorCheck = function(req, res, next){
             next(); //move on to the actual function
         }
         else{
-            var error = {'message': 'permission denied, required patient'};
+            var error = {'message': 'permission denied, required doctor'};
             common(res, error, error, null);
         }
     } catch (exception) {
