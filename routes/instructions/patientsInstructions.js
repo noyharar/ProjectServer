@@ -22,7 +22,6 @@ router.post('/', async function (req, res) {
             Target: req.body.Target,
             TestsResults: req.body.TestsResults,
             TestProcess: req.body.TestProcess
-
         });
         await Instruction.createInstructionsSurgery(newInstruction, function (err, instruction) {
             if (err)
