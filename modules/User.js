@@ -195,5 +195,17 @@ module.exports.changePassword = function(user, newPassword, callback){
 };
 
 
+module.exports.editUser = function(user, field,val, callback){
+    if(typeof(val) == 'undefined') {
+        error = {'message': 'Error has occured. Please try again.'};
+        callback(error);
+    }
+    else{
+        user[field]=val;
+        user.save(callback);
+    }
+
+};
+
 
 

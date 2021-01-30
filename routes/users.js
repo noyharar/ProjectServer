@@ -187,6 +187,30 @@ router.use('/passwordChangeCheck', function (req, res, next) {
   User.passwordCheck(req, res, next);
 });
 
+//get only one field to change and UserID
+router.put('/editUser', async function (req, res) {
+  await User.getUserByUserID(req.body.UserID, async function (err, user) {
+    if (err) {
+      var error = {'message': 'Error has occurred. Please try again.'};
+      common(res, error, 'Error has occurred. Please try again.', null);
+    }
+    else {
+      for (const [key, value] of Object.entries(req.body)) {
+        if (key !== 'UserID') {
+          await User.editUser(user, key, value, function (err) {
+            if (err) {
+              var error = {'message': 'Error has occurred. Please try again.'};
+              common(res, error, 'Error has occurred. Please try again.', null);
+            } else {
+              common(res, false, "Password Changed", null);
+            }
+          });
+        }
+      }
+    }
+  });
+});
+
 router.post('/passwordChangeCheck/changePassword', async function (req, res) {
       await User.getUserByUserID(req.UserID, async function (err, user) {
         if (err) {
