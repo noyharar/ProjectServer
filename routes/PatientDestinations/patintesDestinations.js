@@ -8,7 +8,7 @@ var patientLastWeekSteps = require('../../modules/Destinations').LastWeekPatient
 var StepsMetric = require('../../modules/Metrics').StepsMetric;
 
 var User = require('../../modules/User');
-
+//check
 // var StepDestination = require('../../modules/Destinations').StepsDestination;
 // var PatientsStepsLevel = require('../../modules/Destinations').PatientsStepsLevel;
 
