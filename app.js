@@ -91,6 +91,7 @@ app.use('/auth/patients/PatientDestinations', DestinationsPatientRouter);
 
 app.use('/auth/patients/messages', patientMessagesRouter);
 app.use('/auth/doctors/messages', doctorMessagesRouter);
+
 app.use('/auth/patients/instructions', instructionsSurgeryRouter);
 app.use('/auth/patients/exercises', exercisesPatientRouter);
 app.use('/auth/doctors/exercises', exercisesDoctorRouter);

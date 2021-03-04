@@ -38,6 +38,22 @@ router.post('/:patientId', async function (req, res) {
     });
 });
 
+router.delete('/removeMessage/:messageId', async function (req, res) {
+    await User.getUserByUserID((req.UserID), async function (err, user) {
+        if (err) {
+            common(res, true, err, null);
+            return;
+        }
+        await Message.removeMessage(req.params.messageId, function (err, message) {
+            if (err)
+                common(res, true, err, null);
+            else
+                common(res, false, null, {
+                    messageId: message.MessageId
+                });
+        });
+    });
+});
 
 
 module.exports = router;
