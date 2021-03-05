@@ -112,6 +112,29 @@ app.use(function(err, req, res, next) {
 });
 
 
+
+//helper function to build up the desire time trigger
+function forceMidnightGroupsDataCalculations(hour,minute) {
+  var t = new Date();
+  t.setHours(hour);
+  t.setMinutes(minute);
+  t.setSeconds(0);
+  t.setMilliseconds(0);
+  return t;
+}
+let comperePatients =require('./modules/ComperePatients');
+//get your offset to wait value
+var timetarget = forceMidnightGroupsDataCalculations(16,3).getTime();
+var timenow =  new Date().getTime();
+var offsetmilliseconds = timetarget - timenow;
+
+//if it isn't midnight yet, set a timeout.
+if (offsetmilliseconds >= 0){
+  setTimeout(function(){comperePatients.calculateGroupsData();}, offsetmilliseconds);
+}
+
+
+
 module.exports = app;
 
 
