@@ -157,4 +157,56 @@ router.get('/userInfo', async function(req, res) {
   });
 });
 
+router.post('/changeUserInfo', async function(req, res) {
+  var userid = "";
+  if(req.Type.includes("patient"))
+    userid = req.UserID;
+  else
+    userid = req.body.UserID;
+  await User.updateOne({UserID: userid}, {Height: req.body.Height}, function (err, user) {
+    if(err)
+      common(res, err, err.message, null);
+    else {
+      if(user)
+        common(res, false, null, user.DateOfSurgery);
+      else
+        common(res, false, "Not Found", null);
+    }
+  });
+});
+
+
+
+router.put('/patientUpdate', async function (req, res) {
+    await User.getUserByUserID(req.UserID, async function (err, user) {
+      if (user) {
+        user.UserID = req.body.UserID || user.UserID;
+        user.First_Name = req.body.First_Name || user.First_Name;
+        user.Last_Name = req.body.Last_Name || user.Last_Name;
+        user.Phone_Number = req.body.Phone_Number || user.Phone_Number;
+        user.Gender = req.body.Gender || user.Gender;
+        user.Smoke = req.body.Smoke || user.Smoke;
+        user.SurgeryType = req.body.SurgeryType || user.SurgeryType;
+        user.Education = req.body.Education || user.Education;
+        user.Height = req.body.Height || user.Height;
+        user.Weight = req.body.Weight || user.Weight;
+        user.BMI = req.body.BMI || user.BMI;
+        user.BirthDate = (new Date(req.body.BirthDate || user.BirthDate)).setHours(0, 0, 0, 0);
+        user.DateOfSurgery = req.body.DateOfSurgery;
+        user.Type = ["patient"];
+        user.ValidTime = req.body.ValidTime || user.ValidTime;
+        user.Timestamp = new Date().getTime();
+        await User.updateUser(user, function (error) {
+          if(error)
+            common(res, error, error, null);
+          else
+            common(res,false,null,user);
+        });
+      } else {
+        var error = {'message': 'Taken Email'};
+        common(res, error, error, null);
+      }
+    });
+});
+
 module.exports = router;

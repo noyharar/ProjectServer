@@ -204,8 +204,11 @@ module.exports.editUser = function(user, field,val, callback){
         user[field]=val;
         user.save(callback);
     }
-
 };
 
+
+module.exports.updateUser = function(user, callback){
+    user.save(callback);
+};
 
 

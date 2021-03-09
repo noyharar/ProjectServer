@@ -6,8 +6,8 @@ const { v4: uuidv4 } = require('uuid');
 var User = require('../../modules/User');
 
 
-router.get('/:instructionId', async function (req, res) {
-    await Instruction.getInstructionsSurgery(req.params.instructionId,function (err, instruction) {
+router.get('/', async function (req, res) {
+    await Instruction.getInstructionsSurgery({},function (err, instruction) {
         if(err)
             common(res, true, err, null);
         else
@@ -19,9 +19,9 @@ router.get('/:instructionId', async function (req, res) {
 router.post('/', async function (req, res) {
         const newInstruction = new Instruction({
             InstructionId: req.body.InstructionId,
-            Target: req.body.Target,
-            TestsResults: req.body.TestsResults,
-            TestProcess: req.body.TestProcess
+            Title: req.body.Title,
+            PdfName: req.body.PdfName,
+            ImagePart: req.body.ImagePart
         });
         await Instruction.createInstructionsSurgery(newInstruction, function (err, instruction) {
             if (err)

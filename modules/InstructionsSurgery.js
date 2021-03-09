@@ -11,15 +11,25 @@ var InstructionsSurgerySchema = new Schema({
         type:String,
         unique:true,
     },
-    Target : {
-        type:String,
+    Title : {
+        type: String
     },
-    TestsResults : {
-        type:Array,
+    PdfName: {
+        type: String
     },
-    TestProcess: {
-        type:Array,
+    ImagePart: {
+        type: String
     }
+
+    // Target : {
+    //     type:Array,
+    // },
+    // TestsResults : {
+    //     type:Array,
+    // },
+    // TestProcess: {
+    //     type:Array,
+    // }
 });
 
 //create models
@@ -31,9 +41,9 @@ module.exports.createInstructionsSurgery = function(newInstruction, callback){
 };
 
 //gets messages from db by username
-module.exports.getInstructionsSurgery = async function(instructionId, callback){
-    var query = {InstructionId: instructionId};
-    await InstructionsSurgery.findOne(query, callback);
+module.exports.getInstructionsSurgery = async function({}, callback){
+    // var query = {InstructionId: instructionId};
+    await InstructionsSurgery.find({}, callback);
 };
 
 
