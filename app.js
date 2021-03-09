@@ -124,13 +124,13 @@ function forceMidnightGroupsDataCalculations(hour,minute) {
 }
 let comperePatients =require('./modules/ComperePatients');
 //get your offset to wait value
-var timetarget = forceMidnightGroupsDataCalculations(16,3).getTime();
+var timetarget = forceMidnightGroupsDataCalculations(20,1).getTime();
 var timenow =  new Date().getTime();
 var offsetmilliseconds = timetarget - timenow;
 
 //if it isn't midnight yet, set a timeout.
 if (offsetmilliseconds >= 0){
-  setTimeout(function(){comperePatients.calculateGroupsData();}, offsetmilliseconds);
+  setTimeout(function(){comperePatients.calculateGroupsData().then(r => console.log("finish midnight calculations for patients compere"));}, offsetmilliseconds);
 }
 
 

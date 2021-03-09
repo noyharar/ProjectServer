@@ -1,3 +1,4 @@
+
 let express = require('express');
 let router = express.Router();
 var common = require('../routes/common');
@@ -43,7 +44,120 @@ async function calculateGroupsData() {
             console.log(metric.UserID+" group saved in collection.");
         });
 
-        ///.... all metrics
+        //steps
+        let docsSteps = await StepsMetric.find({
+            UserID: {$in: ids},
+            ValidTime: {$gte: realNow, $lte:start}
+        }).lean().exec();
+
+        let averageSteps=findAverage(docsSteps);
+        let newMetricSteps = new StepsMetric({
+            UserID: groups[i].groupId,
+            Timestamp: realNow,
+            ValidTime: start,
+            Data: averageSteps
+        });
+
+        await newMetricSteps.save(function (err, metric) {
+            if (err) return console.error(err);
+            console.log(metric.UserID+" group saved in collection.");
+        });
+
+        //Calories
+        let docsCalories = await CaloriesMetric.find({
+            UserID: {$in: ids},
+            ValidTime: {$gte: realNow, $lte:start}
+        }).lean().exec();
+
+        let averageCalories=findAverage(docsCalories);
+        let newMetricCalories = new CaloriesMetric({
+            UserID: groups[i].groupId,
+            Timestamp: realNow,
+            ValidTime: start,
+            Data: averageCalories
+        });
+
+        await newMetricCalories.save(function (err, metric) {
+            if (err) return console.error(err);
+            console.log(metric.UserID+" group saved in collection.");
+        });
+        //
+        // //sleep
+        // let docsSleep = await SleepMetric.find({
+        //     UserID: {$in: ids},
+        //     ValidTime: {$gte: realNow, $lte:start}
+        // }).lean().exec();
+        //
+        // let averageSleep=findAverage(docsSleep);
+        // let newMetricSleep = new SleepMetric({
+        //     UserID: groups[i].groupId,
+        //     Timestamp: realNow,
+        //     ValidTime: start,
+        //     Data: averageSleep
+        // });
+        //
+        // await newMetricSleep.save(function (err, metric) {
+        //     if (err) return console.error(err);
+        //     console.log(metric.UserID+" group saved in collection.");
+        // });
+        //
+        // //Accelerometer
+        // let docsAccelerometer = await AccelerometerMetric.find({
+        //     UserID: {$in: ids},
+        //     ValidTime: {$gte: realNow, $lte:start}
+        // }).lean().exec();
+        //
+        // let averageAccelerometer=findAverage(docsAccelerometer);
+        // let newMetricAccelerometer = new AccelerometerMetric({
+        //     UserID: groups[i].groupId,
+        //     Timestamp: realNow,
+        //     ValidTime: start,
+        //     Data: averageAccelerometer
+        // });
+        //
+        // await newMetricAccelerometer.save(function (err, metric) {
+        //     if (err) return console.error(err);
+        //     console.log(metric.UserID+" group saved in collection.");
+        // });
+        //
+        // //Weather
+        // let docsWeather = await WeatherMetric.find({
+        //     UserID: {$in: ids},
+        //     ValidTime: {$gte: realNow, $lte:start}
+        // }).lean().exec();
+        //
+        // let averageWeather=findAverage(docsWeather);
+        // let newMetricWeather= new WeatherMetric({
+        //     UserID: groups[i].groupId,
+        //     Timestamp: realNow,
+        //     ValidTime: start,
+        //     Data: averageWeather
+        // });
+        //
+        // await newMetricWeather.save(function (err, metric) {
+        //     if (err) return console.error(err);
+        //     console.log(metric.UserID+" group saved in collection.");
+        // });
+        //
+        // //activity
+        // let docsActivity = await ActivityMetric.find({
+        //     UserID: {$in: ids},
+        //     ValidTime: {$gte: realNow, $lte:start}
+        // }).lean().exec();
+        //
+        // let averageActivity=findAverage(docsActivity);
+        // let newMetricActivity = new ActivityMetric({
+        //     UserID: groups[i].groupId,
+        //     Timestamp: realNow,
+        //     ValidTime: start,
+        //     Data: averageActivity
+        // });
+        //
+        // await newMetricActivity.save(function (err, metric) {
+        //     if (err) return console.error(err);
+        //     console.log(metric.UserID+" group saved in collection.");
+        // });
+
         }
     }
 
@@ -57,6 +171,7 @@ async function findAllUsersIdsInGroup(group){
 }
 
 function findAverage(docs){
+    if (docs.length==0) return 0;
     let sum=0;
     for (let i=0;i<docs.length;i++)
         sum=sum+docs[i].Data;
