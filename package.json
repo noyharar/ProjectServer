@@ -31,5 +31,6 @@
   "keywords": [],
   "author": "",
   "license": "ISC",
-  "description": ""
+  "description": "",
+  "heroku buildpacks":"set heroku/nodejs"
 }
