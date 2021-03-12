@@ -11,11 +11,11 @@ let User = require('./User');
 let Group = require('./Group');
 
 
-async function calculateGroupsData() {
-  //  var realNow = new Date().setHours(-48,0,0,0);
- //   var start = new Date().setHours(-24,0,0,0);
-    var realNow =1585413706123;
-    var start = 1585413706160;
+module.exports.calculateGroupsData=async function () {
+   var realNow = new Date().setHours(-48,0,0,0);
+    var start = new Date().setHours(-24,0,0,0);
+  //  var realNow =1585413706123;
+   // var start = 1585413706160;
     let groups= await Group.getAllGroups();
     for (let i=0; i<groups.length;i++){
         let users=await findAllUsersIdsInGroup(groups[i]);
@@ -178,4 +178,3 @@ function findAverage(docs){
 
 }
 
-module.exports=calculateGroupsData;
