@@ -22,6 +22,7 @@ var doctorMessagesRouter = require('./routes/messages/doctorsMessages');
 var instructionsSurgeryRouter = require('./routes/instructions/patientsInstructions');
 var exercisesPatientRouter = require('./routes/exercises/patientsExercises');
 var exercisesDoctorRouter = require('./routes/exercises/doctorsExercises');
+var compereByDoctorRouter = require('./routes/comperePatients/compereByDoctor');
 
 var app = express();
 var cors = require('cors');
@@ -94,6 +95,7 @@ app.use('/auth/doctors/messages', doctorMessagesRouter);
 app.use('/auth/patients/instructions', instructionsSurgeryRouter);
 app.use('/auth/patients/exercises', exercisesPatientRouter);
 app.use('/auth/doctors/exercises', exercisesDoctorRouter);
+app.use('/auth/doctors/comperePatients',compereByDoctorRouter);
 
 // catch 404 and forward to error handler
 app.use(function(req, res, next) {
@@ -124,7 +126,7 @@ function forceMidnightGroupsDataCalculations(hour,minute) {
 }
 let comperePatients =require('./modules/ComperePatients');
 //get your offset to wait value
-var timetarget = forceMidnightGroupsDataCalculations(20,1).getTime();
+var timetarget = forceMidnightGroupsDataCalculations(20,22).getTime();
 var timenow =  new Date().getTime();
 var offsetmilliseconds = timetarget - timenow;
 

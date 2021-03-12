@@ -1,7 +1,5 @@
 
 let express = require('express');
-let router = express.Router();
-var common = require('../routes/common');
 let StepsMetric = require('./Metrics').StepsMetric;
 let DistanceMetric = require('./Metrics').DistanceMetric;
 let CaloriesMetric = require('./Metrics').CaloriesMetric;
@@ -180,4 +178,4 @@ function findAverage(docs){
 
 }
 
-module.exports=calculateGroupsData();
+module.exports=calculateGroupsData;
