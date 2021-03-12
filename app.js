@@ -126,7 +126,7 @@ function forceMidnightGroupsDataCalculations(hour,minute) {
 }
 let comperePatients =require('./modules/ComperePatients');
 //get your offset to wait value
-var timetarget = forceMidnightGroupsDataCalculations(11,28).getTime();
+var timetarget = forceMidnightGroupsDataCalculations(3,28).getTime();
 var timenow =  new Date().getTime();
 var offsetmilliseconds = timetarget - timenow;
 
