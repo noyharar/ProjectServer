@@ -21,7 +21,8 @@ router.post('/', async function (req, res) {
             InstructionId: req.body.InstructionId,
             Title: req.body.Title,
             PdfName: req.body.PdfName,
-            ImagePart: req.body.ImagePart
+            ImagePart: req.body.ImagePart,
+            Category: req.body.Category,
         });
         await Instruction.createInstructionsSurgery(newInstruction, function (err, instruction) {
             if (err)
