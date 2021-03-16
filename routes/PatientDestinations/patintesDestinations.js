@@ -30,7 +30,7 @@ router.post('/insertLastWeekSteps', async function (req, res) {
 router.post('/insertLastDaySteps', async function (req, res) {
     let lastDaySteps = new patientLastDaySteps({
         UserID: req.UserID,
-        LastDayStepsNumber: req.body.LastDayStepsNumber,
+        LastDayStepsNumber: 0,
         Timestamp: (new Date).getTime(),
     });
     await lastDaySteps.save(function (error) {
