@@ -22,6 +22,7 @@ var doctorMessagesRouter = require('./routes/messages/doctorsMessages');
 var instructionsSurgeryRouter = require('./routes/instructions/patientsInstructions');
 var exercisesPatientRouter = require('./routes/exercises/patientsExercises');
 var exercisesDoctorRouter = require('./routes/exercises/doctorsExercises');
+var compereByDoctorRouter = require('./routes/comperePatients/compereByDoctor');
 
 var app = express();
 var cors = require('cors');
@@ -95,6 +96,7 @@ app.use('/auth/doctors/messages', doctorMessagesRouter);
 app.use('/auth/patients/instructions', instructionsSurgeryRouter);
 app.use('/auth/patients/exercises', exercisesPatientRouter);
 app.use('/auth/doctors/exercises', exercisesDoctorRouter);
+app.use('/auth/doctors/comperePatients',compereByDoctorRouter);
 
 // catch 404 and forward to error handler
 app.use(function(req, res, next) {
@@ -111,6 +113,29 @@ app.use(function(err, req, res, next) {
   res.status(err.status || 500);
   res.render('error');
 });
+
+
+
+//helper function to build up the desire time trigger
+function forceMidnightGroupsDataCalculations(hour,minute) {
+  var t = new Date();
+  t.setHours(hour);
+  t.setMinutes(minute);
+  t.setSeconds(0);
+  t.setMilliseconds(0);
+  return t;
+}
+let comperePatients =require('./modules/ComperePatients');
+//get your offset to wait value
+var timetarget = forceMidnightGroupsDataCalculations(3,28).getTime();
+var timenow =  new Date().getTime();
+var offsetmilliseconds = timetarget - timenow;
+
+//if it isn't midnight yet, set a timeout.
+if (offsetmilliseconds >= 0){
+  setTimeout(function(){comperePatients.calculateGroupsData().then(r => console.log("finish midnight calculations for patients compere"));}, offsetmilliseconds);
+}
+
 
 
 module.exports = app;

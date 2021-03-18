@@ -10,6 +10,14 @@ var LastDayPatientStepsSchema = new Schema({
     Timestamp: Number,
 });
 
+var LastWeekPatientStepsSchema = new Schema({
+    UserID: String,
+    CurrentWeekSteps: Number,
+    LastWeekStepsNumber: Number,
+    WeekNumAfterSurgery: Number,
+    Timestamp: Number,
+});
+
 //-----------------------------------------old schemas not used-----------------------------------------
 
 // var StepsDestinationSchema = new Schema({
@@ -29,6 +37,7 @@ var LastDayPatientStepsSchema = new Schema({
 
 
 module.exports.LastDayPatientSteps = mongoose.model('HistoryDaySteps', LastDayPatientStepsSchema, 'HistoryDaySteps');
+module.exports.LastWeekPatientStepsSchema = mongoose.model('HistoryWeeklySteps', LastWeekPatientStepsSchema, 'HistoryWeeklySteps');
 
 
 // module.exports.StepsDestination = mongoose.model('StepsDestination', StepsDestinationSchema, 'StepsDestination');
