@@ -8,7 +8,7 @@ router.use('/', function (req, res, next){
     User.privateCheck(req, res, next);
 });
 
-router.use('/patients', function (req, res, next) {
+router.use('/patien ts', function (req, res, next) {
     User.patientCheck(req, res, next);
 });
 

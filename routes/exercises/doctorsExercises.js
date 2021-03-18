@@ -38,39 +38,21 @@ router.post('/', async function (req, res) {
     // });
 });
 
-// router.post('/removeMessage', async function (req, res) {
-//     await User.getUserByUserID((req.UserID), async function (err, user) {
-//         if (err) {
-//             common(res, true, err, null);
-//             return;
-//         }
-//         await Message.removeMessage(req.body.MessageId, function (err, message) {
-//             if (err)
-//                 common(res, true, err, null);
-//             else
-//                 common(res, false, null, {
-//                     messageId: message.MessageId
-//                 });
-//         });
-//     });
-// });
-
-// router.put('/updateMessage', async function (req, res) {
-//     await User.getUserByUserID((req.UserID), async function (err, user) {
-//         if (err) {
-//             common(res, true, err, null);
-//             return;
-//         }
-//         await Message.updateMessage(req.body.MessageId, req.body.Content, function (err, message) {
-//             if (err)
-//                 common(res, true, err, null);
-//             else
-//                 common(res, false, null, {
-//                     messageId: message.MessageId
-//                 });
-//         });
-//     });
-// });
-
+router.delete('/removeExercise/:ExerciseId', async function (req, res) {
+    // await Exercise.getExerciseByUrl((req.params.url), async function (err, exercise) {
+    //     if (err) {
+    //         common(res, true, err, null);
+    //         return;
+    //     }
+        await Exercise.removeExercise(req.params.ExerciseId, async function (err, exerciseNoy) {
+            if (err)
+                common(res, true, err, null);
+            else
+                common(res, false, null, {
+                    exerciseId: exerciseNoy.ExerciseId
+                });
+        });
+    // });
+});
 
 module.exports = router;
