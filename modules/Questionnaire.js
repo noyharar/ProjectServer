@@ -8,6 +8,7 @@ var QuestionnaireSchema = new Schema({
     QuestionnaireID: Number,
     QuestionnaireText: String,
     QuestionnaireEnglishText: String,
+    Category: String,
     Questions: [
         {
             QuestionID: Number,
