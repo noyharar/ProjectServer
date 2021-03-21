@@ -4,6 +4,9 @@ var User = require('../modules/User');
 var common = require('./common');
 var jwt = require('jsonwebtoken');
 var tempToken = "password";
+var Exercise = require('../modules/Exercise');
+var Instruction = require('../modules/InstructionsSurgery');
+
 
 router.get('/getFirsts', async function(req, res) {
   var allUsers = await User.find({Type: ["patient"]}).lean().exec();
@@ -230,6 +233,24 @@ router.put('/doctorUpdate', async function (req, res) {
       var error = {'message': 'Taken Email'};
       common(res, error, error, null);
     }
+  });
+});
+
+router.get('/exercises', async function (req, res) {
+  await Exercise.getExercises(function (err, exercise) {
+    if(err)
+      common(res, true, err, null);
+    else
+      common(res, false, null, exercise);
+  });
+});
+
+router.get('/instructions', async function (req, res) {
+  await Instruction.getInstructionsSurgery({},function (err, instruction) {
+    if(err)
+      common(res, true, err, null);
+    else
+      common(res, false, null, instruction);
   });
 });
 
