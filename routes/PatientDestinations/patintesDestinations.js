@@ -15,27 +15,43 @@ var User = require('../../modules/User');
 
 
 router.post('/insertLastWeekSteps', async function (req, res) {
-    let lastWeekSteps = new patientLastWeekSteps({
-        UserID: req.UserID,
-        CurrentWeekSteps: 0,
-        LastWeekStepsNumber: 0,
-        WeekNumAfterSurgery: 0,
-        Timestamp: (new Date).getTime(),
-    });
-    await lastWeekSteps.save(function (error) {
-        common(res, error, error, lastWeekSteps)
-    });
+    const user = await patientLastWeekSteps.find({UserID: req.UserID,});
+    let size = user.length;
+    if (size === 0) {
+        let lastWeekSteps = new patientLastWeekSteps({
+            UserID: req.UserID,
+            CurrentWeekSteps: 0,
+            LastWeekStepsNumber: 0,
+            WeekNumAfterSurgery: 0,
+            Timestamp: (new Date).getTime(),
+        });
+        await lastWeekSteps.save(function (error) {
+            common(res, error, error, lastWeekSteps)
+        });
+    }
+    else {
+        var error = { 'message': 'Initial data exist' };
+        common(res, error, error, null);
+    }
 });
 
 router.post('/insertLastDaySteps', async function (req, res) {
-    let lastDaySteps = new patientLastDaySteps({
-        UserID: req.UserID,
-        LastDayStepsNumber: req.body.LastDayStepsNumber,
-        Timestamp: (new Date).getTime(),
-    });
-    await lastDaySteps.save(function (error) {
-        common(res, error, error, lastDaySteps)
-    });
+    const user = await patientLastDaySteps.find({UserID: req.UserID,});
+    let size = user.length;
+    if (size === 0) {
+        let lastDaySteps = new patientLastDaySteps({
+            UserID: req.UserID,
+            LastDayStepsNumber: 0,
+            Timestamp: (new Date).getTime(),
+        });
+        await lastDaySteps.save(function (error) {
+            common(res, error, error, lastDaySteps)
+        });
+    }
+    else {
+        var error = { 'message': 'Initial data exist' };
+        common(res, error, error, null);
+    }
 });
 
 router.get('/checkPatientProgress', async function (req,res){

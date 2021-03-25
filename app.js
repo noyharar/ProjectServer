@@ -19,8 +19,7 @@ var requestsDoctorRouter = require('./routes/permissionRequests/permissionReques
 var DestinationsPatientRouter = require('./routes/PatientDestinations/patintesDestinations');
 var patientMessagesRouter = require('./routes/messages/patientsMessages');
 var doctorMessagesRouter = require('./routes/messages/doctorsMessages');
-var instructionsSurgeryRouter = require('./routes/instructions/patientsInstructions');
-var exercisesPatientRouter = require('./routes/exercises/patientsExercises');
+var instructionsSurgeryRouter = require('./routes/instructions/doctorsInstructions');
 var exercisesDoctorRouter = require('./routes/exercises/doctorsExercises');
 var compereByDoctorRouter = require('./routes/comperePatients/compereByDoctor');
 
@@ -89,12 +88,9 @@ app.use('/auth/patients/answers', answersPatientRouter);
 app.use('/auth/doctors/answers', answersDoctorRouter);
 app.use('/auth/doctors/permissionRequests', requestsDoctorRouter);
 app.use('/auth/patients/PatientDestinations', DestinationsPatientRouter);
-
 app.use('/auth/patients/messages', patientMessagesRouter);
 app.use('/auth/doctors/messages', doctorMessagesRouter);
-
-app.use('/auth/patients/instructions', instructionsSurgeryRouter);
-app.use('/auth/patients/exercises', exercisesPatientRouter);
+app.use('/auth/doctors/instructions', instructionsSurgeryRouter);
 app.use('/auth/doctors/exercises', exercisesDoctorRouter);
 app.use('/auth/doctors/comperePatients',compereByDoctorRouter);
 

@@ -4,6 +4,9 @@ var User = require('../modules/User');
 var common = require('./common');
 var jwt = require('jsonwebtoken');
 var tempToken = "password";
+var Exercise = require('../modules/Exercise');
+var Instruction = require('../modules/InstructionsSurgery');
+
 
 router.get('/getFirsts', async function(req, res) {
   var allUsers = await User.find({Type: ["patient"]}).lean().exec();
@@ -207,6 +210,48 @@ router.put('/patientUpdate', async function (req, res) {
         common(res, error, error, null);
       }
     });
+});
+
+router.put('/doctorUpdate', async function (req, res) {
+  await User.getUserByUserID(req.UserID, async function (err, user) {
+    if (user) {
+      user.UserID = req.body.UserID || user.UserID;
+      user.First_Name = req.body.First_Name || user.First_Name;
+      user.Last_Name = req.body.Last_Name || user.Last_Name;
+      user.Phone_Number = req.body.Phone_Number || user.Phone_Number;
+      user.BirthDate = (new Date(req.body.BirthDate || user.BirthDate)).setHours(0, 0, 0, 0);
+      user.Type = ["doctor"];
+      user.ValidTime = req.body.ValidTime || user.ValidTime;
+      user.Timestamp = new Date().getTime();
+      await User.updateUser(user, function (error) {
+        if(error)
+          common(res, error, error, null);
+        else
+          common(res,false,null,user);
+      });
+    } else {
+      var error = {'message': 'Taken Email'};
+      common(res, error, error, null);
+    }
+  });
+});
+
+router.get('/exercises', async function (req, res) {
+  await Exercise.getExercises(function (err, exercise) {
+    if(err)
+      common(res, true, err, null);
+    else
+      common(res, false, null, exercise);
+  });
+});
+
+router.get('/instructions', async function (req, res) {
+  await Instruction.getInstructionsSurgery({},function (err, instruction) {
+    if(err)
+      common(res, true, err, null);
+    else
+      common(res, false, null, instruction);
+  });
 });
 
 module.exports = router;

@@ -20,8 +20,8 @@ var InstructionsSurgerySchema = new Schema({
     ImagePart: {
         type: String
     },
-    Category:{
-        type:String
+    Category: {
+        type: String
     }
 
     // Target : {

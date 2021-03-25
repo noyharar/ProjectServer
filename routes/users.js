@@ -105,7 +105,7 @@ router.post('/doctorRegister', async function(req, res){
           VerificationAnswer: req.body.VerificationAnswer,
           ValidTime: req.body.ValidTime,
           Timestamp: new Date().getTime()
-        });
+        }); 
         await User.createUser(newUser, function (error, user) {
           if(error)
             common(res, error, error, null);
