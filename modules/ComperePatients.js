@@ -10,7 +10,7 @@ let ActivityMetric = require('./Metrics').ActivityMetric;
 let User = require('./User');
 let Group = require('./Group');
 
-
+//http://localhost:8180/auth/doctors/comperePatients/getDistanceCompere?start_time=150000000000&end_time=1685413707000&filter="BMI"&groupId=BMI 18.5-25
 module.exports.calculateGroupsData=async function () {
    var realNow = new Date().setHours(-48,0,0,0);
     var start = new Date().setHours(-24,0,0,0);
@@ -164,6 +164,11 @@ async function findAllUsersIdsInGroup(group){
     let filterValue=group.filter.filterValue;
     let query={};
     query[filterName]=filterValue;
+    if (filterName=="BMI"){
+        let min=filterValue.substr(0,filterValue.indexOf('-'));
+        let max=filterValue.substring(filterValue.indexOf('-')+1);
+        return await User.find( {BMI_NUMBER: {$gte: parseFloat(min), $lte:parseFloat(max)}});
+    }
     return await User.find(query).lean().exec();
 
 }
