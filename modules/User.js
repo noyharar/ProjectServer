@@ -37,6 +37,8 @@ var UserSchema = new Schema({
             ],
         default: undefined
     },
+    changedSurgeryDate: Boolean,
+    changedQuestionnaires: Boolean,
     ValidTime: Number,
     Timestamp: Number
 });
