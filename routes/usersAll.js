@@ -6,6 +6,8 @@ var jwt = require('jsonwebtoken');
 var tempToken = "password";
 var Exercise = require('../modules/Exercise');
 var Instruction = require('../modules/InstructionsSurgery');
+const { createGridFSReadStream, getGridFSFiles } = require("../instructionsUpload/my-gridfs-service");
+const asyncWrapper = require("../instructionsUpload/async-wrapper");
 
 
 router.get('/getFirsts', async function(req, res) {
@@ -264,5 +266,21 @@ router.get('/instructions', async function (req, res) {
       common(res, false, null, instruction);
   });
 });
+
+router.get(
+    "/instructions/:id",
+    asyncWrapper(async (req, res) => {
+      const instruction = await getGridFSFiles(req.params.id);
+      if (!instruction) {
+        let err = { message: "Instruction not found" };
+        common(res, err, err, null);
+        return;
+      }
+      res.setHeader('Content-disposition', 'attachment; filename=' + instruction.filename);
+      res.setHeader("content-type", instruction.contentType);
+      const readStream = createGridFSReadStream(req.params.id);
+      readStream.pipe(res);
+    })
+);
 
 module.exports = router;

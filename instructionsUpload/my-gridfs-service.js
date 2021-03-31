@@ -52,6 +52,10 @@ const createGridFSReadStream = id => {
     return gridFSBucket.openDownloadStream(mongoose.Types.ObjectId(id));
 };
 
+const deleteFile = id => {
+    gridFSBucket.delete(mongoose.Types.ObjectId(id))
+};
+
 const storage = new GridFsStorage({
     url: dbPath,
     cache: true,
@@ -79,5 +83,6 @@ module.exports = mongoose;
 module.exports.storage = storage;
 module.exports.getGridFSFiles = getGridFSFiles;
 module.exports.createGridFSReadStream = createGridFSReadStream;
+module.exports.deleteFile = deleteFile;
 module.exports.onError = onError;
 module.exports.onOpen = onOpen;
