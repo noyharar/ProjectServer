@@ -62,6 +62,7 @@ router.post('/patientRegister', async function (req, res) {
           Height: req.body.Height,
           Weight: req.body.Weight,
           BMI: req.body.BMI,
+          BMI_NUMBER: req.body.BMI_NUMBER,
           BirthDate: (new Date(req.body.BirthDate)).setHours(0, 0, 0, 0),
           Type: ["patient"],
           DateOfSurgery: req.body.DateOfSurgery,

@@ -23,6 +23,7 @@ var UserSchema = new Schema({
     Height: Number,
     Weight: Number,
     BMI: String,
+    BMI_NUMBER: Number ,
     BirthDate: Number,
     Type: [String],
     DateOfSurgery: Number,
