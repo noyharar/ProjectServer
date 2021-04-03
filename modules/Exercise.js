@@ -16,6 +16,7 @@ var ExerciseSchema = new Schema({
     },
     Video : {
         type:String,
+        unique:true
     },
 });
 
@@ -27,10 +28,18 @@ module.exports.createExercise= function(newExercise, callback){
     newExercise.save(callback);
 };
 
-//gets messages from db by category
 module.exports.getExercises = async function(callback){
     // var query = {Category: category};
     await Exercise.find({},callback);
+};
+module.exports.getExerciseByUrl = async function(url, callback){
+    var query = {Video: url};
+    await Exercise.findOne(query, callback);
+};
+
+module.exports.removeExercise = async function(exerciseId, callback){
+    var query = {ExerciseId: exerciseId};
+    await Exercise.deleteOne(query, callback);
 };
 
 // module.exports.postNewVideo = async function(category,newVideo, callback){

@@ -62,6 +62,7 @@ router.post('/patientRegister', async function (req, res) {
           Height: req.body.Height,
           Weight: req.body.Weight,
           BMI: req.body.BMI,
+          BMI_NUMBER: req.body.BMI_NUMBER,
           BirthDate: (new Date(req.body.BirthDate)).setHours(0, 0, 0, 0),
           Type: ["patient"],
           DateOfSurgery: req.body.DateOfSurgery,
@@ -69,7 +70,9 @@ router.post('/patientRegister', async function (req, res) {
           VerificationQuestion: req.body.VerificationQuestion,
           VerificationAnswer: req.body.VerificationAnswer,
           ValidTime: req.body.ValidTime,
-          Timestamp: new Date().getTime()
+          Timestamp: new Date().getTime(),
+          changedSurgeryDate: false,
+          changedQuestionnaires: false
         });
         await User.createUser(newUser, function (error, user) {
           if(error)
@@ -105,7 +108,7 @@ router.post('/doctorRegister', async function(req, res){
           VerificationAnswer: req.body.VerificationAnswer,
           ValidTime: req.body.ValidTime,
           Timestamp: new Date().getTime()
-        });
+        }); 
         await User.createUser(newUser, function (error, user) {
           if(error)
             common(res, error, error, null);
@@ -185,6 +188,30 @@ router.post('/checkVerification', async function(req, res){
 
 router.use('/passwordChangeCheck', function (req, res, next) {
   User.passwordCheck(req, res, next);
+});
+
+//get only one field to change and UserID
+router.put('/editUser', async function (req, res) {
+  await User.getUserByUserID(req.body.UserID, async function (err, user) {
+    if (err) {
+      var error = {'message': 'Error has occurred. Please try again.'};
+      common(res, error, 'Error has occurred. Please try again.', null);
+    }
+    else {
+      for (const [key, value] of Object.entries(req.body)) {
+        if (key !== 'UserID') {
+          await User.editUser(user, key, value, function (err) {
+            if (err) {
+              var error = {'message': 'Error has occurred. Please try again.'};
+              common(res, error, 'Error has occurred. Please try again.', null);
+            } else {
+              common(res, false, "Password Changed", null);
+            }
+          });
+        }
+      }
+    }
+  });
 });
 
 router.post('/passwordChangeCheck/changePassword', async function (req, res) {

@@ -23,6 +23,7 @@ var UserSchema = new Schema({
     Height: Number,
     Weight: Number,
     BMI: String,
+    BMI_NUMBER: Number ,
     BirthDate: Number,
     Type: [String],
     DateOfSurgery: Number,
@@ -37,6 +38,8 @@ var UserSchema = new Schema({
             ],
         default: undefined
     },
+    changedSurgeryDate: Boolean,
+    changedQuestionnaires: Boolean,
     ValidTime: Number,
     Timestamp: Number
 });
@@ -195,5 +198,20 @@ module.exports.changePassword = function(user, newPassword, callback){
 };
 
 
+module.exports.editUser = function(user, field,val, callback){
+    if(typeof(val) == 'undefined') {
+        error = {'message': 'Error has occured. Please try again.'};
+        callback(error);
+    }
+    else{
+        user[field]=val;
+        user.save(callback);
+    }
+};
+
+
+module.exports.updateUser = function(user, callback){
+    user.save(callback);
+};
 
 

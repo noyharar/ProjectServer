@@ -19,9 +19,10 @@ var requestsDoctorRouter = require('./routes/permissionRequests/permissionReques
 var DestinationsPatientRouter = require('./routes/PatientDestinations/patintesDestinations');
 var patientMessagesRouter = require('./routes/messages/patientsMessages');
 var doctorMessagesRouter = require('./routes/messages/doctorsMessages');
-var instructionsSurgeryRouter = require('./routes/instructions/patientsInstructions');
-var exercisesPatientRouter = require('./routes/exercises/patientsExercises');
+var instructionsSurgeryRouter = require('./routes/instructions/doctorsInstructions');
 var exercisesDoctorRouter = require('./routes/exercises/doctorsExercises');
+var compereByDoctorRouter = require('./routes/comperePatients/compereByDoctor');
+const { onOpen, onError } = require("./instructionsUpload/my-gridfs-service");
 
 var app = express();
 var cors = require('cors');
@@ -59,16 +60,20 @@ mongoose.connect(mongoNoyUrl,  { useNewUrlParser: true });
 // Get Mongoose to use the global promise library
 mongoose.Promise = global.Promise;
 //Get the default connection
-var db = mongoose.connection;
+const db = mongoose.connection;
 db.once('open', function (err) {
   if (!err) {
     console.log("connected to mongo db");
+    onOpen(db.db);
   }
   else
     console.log("failed");
 });
 //Bind connection to error event (to get notification of connection errors)
-db.on('error', console.error.bind(console, 'MongoDB connection error:'));
+db.on('error', function () {
+  console.error.bind(console, 'MongoDB connection error:');
+  onError();
+});
 
 // view engine setup
 app.set('views', path.join(__dirname, 'views'));
@@ -88,12 +93,11 @@ app.use('/auth/patients/answers', answersPatientRouter);
 app.use('/auth/doctors/answers', answersDoctorRouter);
 app.use('/auth/doctors/permissionRequests', requestsDoctorRouter);
 app.use('/auth/patients/PatientDestinations', DestinationsPatientRouter);
-
 app.use('/auth/patients/messages', patientMessagesRouter);
 app.use('/auth/doctors/messages', doctorMessagesRouter);
-app.use('/auth/patients/instructions', instructionsSurgeryRouter);
-app.use('/auth/patients/exercises', exercisesPatientRouter);
+app.use('/auth/doctors/instructions', instructionsSurgeryRouter);
 app.use('/auth/doctors/exercises', exercisesDoctorRouter);
+app.use('/auth/doctors/comperePatients',compereByDoctorRouter);
 
 // catch 404 and forward to error handler
 app.use(function(req, res, next) {
@@ -110,6 +114,29 @@ app.use(function(err, req, res, next) {
   res.status(err.status || 500);
   res.render('error');
 });
+
+
+
+//helper function to build up the desire time trigger
+function forceMidnightGroupsDataCalculations(hour,minute) {
+  var t = new Date();
+  t.setHours(hour);
+  t.setMinutes(minute);
+  t.setSeconds(0);
+  t.setMilliseconds(0);
+  return t;
+}
+let comperePatients =require('./modules/ComperePatients');
+//get your offset to wait value
+var timetarget = forceMidnightGroupsDataCalculations(3,28).getTime();
+var timenow =  new Date().getTime();
+var offsetmilliseconds = timetarget - timenow;
+
+//if it isn't midnight yet, set a timeout.
+if (offsetmilliseconds >= 0){
+  setTimeout(function(){comperePatients.calculateGroupsData().then(r => console.log("finish midnight calculations for patients compere"));}, offsetmilliseconds);
+}
+
 
 
 module.exports = app;

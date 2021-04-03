@@ -34,6 +34,11 @@ router.get('/getUsers', async function (req, res, next) {
     common(res, null, null, allUsers);
 });
 
+router.post('/userId', async function (req, res, next) {
+    let userId = service.hashElement(req.body.UserID)
+    common(res, null, null, userId);
+});
+
 router.get('/getSteps', async function (req, res, next) {
     //if dates were not specified - query for all dates
     if (typeof(req.query.start_time) == 'undefined') {
@@ -44,6 +49,8 @@ router.get('/getSteps', async function (req, res, next) {
     }
     req.query.start_time = parseFloat(req.query.start_time);
     req.query.end_time = parseFloat(req.query.end_time);
+    console.log(req.query.start_time)
+    console.log(req.query.end_time)
     let ans = [];
     if (req.query.UserID) {
         let user = await User.findOne({UserID: req.query.UserID}).lean().exec();
