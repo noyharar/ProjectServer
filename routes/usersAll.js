@@ -77,8 +77,9 @@ router.post('/getUserQuestionnaireByCategory', async function(req, res) {
       titles_arr.push(question_title)
     }
   }
-  common(res, false, null, {titles:titles_arr});
+  common(res, false, null, titles_arr);
 });
+
 
 router.post('/changeUserQuestionnaire', async function(req, res) {
   let daily = {QuestionnaireID: 0, QuestionnaireText: "יומי"};
