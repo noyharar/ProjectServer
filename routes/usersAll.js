@@ -58,7 +58,7 @@ router.get('/getUserQuestionnaire', async function(req, res) {
 });
 
 
-router.get('/getUserQuestionnaireByCategory', async function(req, res) {
+router.post('/getUserQuestionnaireByCategory', async function(req, res) {
   const user1 = await User.find({UserID: req.UserID,})
   let idQuestionnairesArr =[]
   let titles_arr = []
