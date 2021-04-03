@@ -1,6 +1,7 @@
 var express = require('express');
 var router = express.Router();
 var User = require('../modules/User');
+var Questionnaire = require('../modules/Questionnaire');
 var common = require('./common');
 var jwt = require('jsonwebtoken');
 var tempToken = "password";
@@ -54,6 +55,29 @@ router.get('/getUserQuestionnaire', async function(req, res) {
         common(res, false, "Not Found", null);
     }
   });
+});
+
+
+router.get('/getUserQuestionnaireByCategory', async function(req, res) {
+  const user1 = await User.find({UserID: req.UserID,})
+  let idQuestionnairesArr =[]
+  let titles_arr = []
+  let num_questionnaires = user1[0].Questionnaires.length;
+  let category = req.body.Category;
+  let i;
+  let j;
+  for (i = 0; i < num_questionnaires; i++) {
+      idQuestionnairesArr.push(user1[0].Questionnaires[i]['_doc'].QuestionnaireID)
+  }
+  for (j = 0; j < idQuestionnairesArr.length; j++) {
+    const question = await Questionnaire.find({QuestionnaireID: idQuestionnairesArr[j],})
+    let question_category = question[0]['_doc'].Category
+    if (category === question_category){
+      let question_title = question[0]['_doc'].QuestionnaireText
+      titles_arr.push(question_title)
+    }
+  }
+  common(res, false, null, titles_arr);
 });
 
 router.post('/changeUserQuestionnaire', async function(req, res) {
@@ -155,6 +179,7 @@ router.post('/askChangePassword', async function (req, res) {
     }
   });
 });
+
 
 router.get('/userInfo', async function(req, res) {
   var userid = "";
