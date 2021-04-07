@@ -79,98 +79,41 @@ module.exports.calculateGroupsData=async function () {
             if (err) return console.error(err);
             console.log(metric.UserID+" group saved in collection.");
         });
-        //
-        // //sleep
-        // let docsSleep = await SleepMetric.find({
-        //     UserID: {$in: ids},
-        //     ValidTime: {$gte: realNow, $lte:start}
-        // }).lean().exec();
-        //
-        // let averageSleep=findAverage(docsSleep);
-        // let newMetricSleep = new SleepMetric({
-        //     UserID: groups[i].groupId,
-        //     Timestamp: realNow,
-        //     ValidTime: start,
-        //     Data: averageSleep
-        // });
-        //
-        // await newMetricSleep.save(function (err, metric) {
-        //     if (err) return console.error(err);
-        //     console.log(metric.UserID+" group saved in collection.");
-        // });
-        //
-        // //Accelerometer
-        // let docsAccelerometer = await AccelerometerMetric.find({
-        //     UserID: {$in: ids},
-        //     ValidTime: {$gte: realNow, $lte:start}
-        // }).lean().exec();
-        //
-        // let averageAccelerometer=findAverage(docsAccelerometer);
-        // let newMetricAccelerometer = new AccelerometerMetric({
-        //     UserID: groups[i].groupId,
-        //     Timestamp: realNow,
-        //     ValidTime: start,
-        //     Data: averageAccelerometer
-        // });
-        //
-        // await newMetricAccelerometer.save(function (err, metric) {
-        //     if (err) return console.error(err);
-        //     console.log(metric.UserID+" group saved in collection.");
-        // });
-        //
-        // //Weather
-        // let docsWeather = await WeatherMetric.find({
-        //     UserID: {$in: ids},
-        //     ValidTime: {$gte: realNow, $lte:start}
-        // }).lean().exec();
-        //
-        // let averageWeather=findAverage(docsWeather);
-        // let newMetricWeather= new WeatherMetric({
-        //     UserID: groups[i].groupId,
-        //     Timestamp: realNow,
-        //     ValidTime: start,
-        //     Data: averageWeather
-        // });
-        //
-        // await newMetricWeather.save(function (err, metric) {
-        //     if (err) return console.error(err);
-        //     console.log(metric.UserID+" group saved in collection.");
-        // });
-        //
-        // //activity
-        // let docsActivity = await ActivityMetric.find({
-        //     UserID: {$in: ids},
-        //     ValidTime: {$gte: realNow, $lte:start}
-        // }).lean().exec();
-        //
-        // let averageActivity=findAverage(docsActivity);
-        // let newMetricActivity = new ActivityMetric({
-        //     UserID: groups[i].groupId,
-        //     Timestamp: realNow,
-        //     ValidTime: start,
-        //     Data: averageActivity
-        // });
-        //
-        // await newMetricActivity.save(function (err, metric) {
-        //     if (err) return console.error(err);
-        //     console.log(metric.UserID+" group saved in collection.");
-        // });
+
 
         }
     }
 
 async function findAllUsersIdsInGroup(group){
+    let isBeforeSurgery;
+    if (group.groupId.endsWith("Before")) isBeforeSurgery=true;
+    else isBeforeSurgery=false;
+
     let filterName=group.filter.filterName;
     let filterValue=group.filter.filterValue;
-    let query={};
-    query[filterName]=filterValue;
     if (filterName=="BMI"){
-        let min=filterValue.substr(0,filterValue.indexOf('-'));
-        let max=filterValue.substring(filterValue.indexOf('-')+1);
-        return await User.find( {BMI_NUMBER: {$gte: parseFloat(min), $lte:parseFloat(max)}});
-    }
-    return await User.find(query).lean().exec();
 
+             let min=filterValue.substr(0,filterValue.indexOf('-'));
+             if (min =="") // bmi 40+
+             {
+                 min=40;
+                 if (isBeforeSurgery)
+                     return await User.find( {BMI_NUMBER: {$gte: parseFloat(min)},"DateOfSurgery":{$gte:new Date().getTime()}});
+                 else
+                     return await User.find( {BMI_NUMBER: {$gte: parseFloat(min)},"DateOfSurgery":{$lt:new Date().getTime()}});
+             }
+             let max=filterValue.substring(filterValue.indexOf('-')+1);
+
+
+        if (isBeforeSurgery)
+        return await User.find( {BMI_NUMBER: {$gte: parseFloat(min), $lte:parseFloat(max)},"DateOfSurgery":{$gte:new Date().getTime()}});
+        else
+            return await User.find( {BMI_NUMBER: {$gte: parseFloat(min), $lte:parseFloat(max)},"DateOfSurgery":{$lt:new Date().getTime()}});
+    }
+    if (isBeforeSurgery)
+    return await User.find({"DateOfSurgery":{$gte:new Date().getTime()},[filterName]:[filterValue]}).lean().exec();
+    else
+        return await User.find({"DateOfSurgery":{$lt:new Date().getTime()},[filterName]:[filterValue]}).lean().exec();
 }
 
 function findAverage(docs){
