@@ -58,6 +58,17 @@ router.get('/getUserQuestionnaire', async function(req, res) {
 });
 
 
+router.get('/getChangeWithSurgeryOrQuestionnaires', async function(req, res) {
+  // let  status_array = []
+  const user1 = await User.find({UserID: req.UserID,})
+  let changedQuestionnaires = user1[0].changedQuestionnaires;
+  let changedSurgeryDate = user1[0].changedSurgeryDate;
+  // status_array.push(changedQuestionnaires)
+  // status_array.push(changedSurgeryDate)
+  common(res, false, null, {changedQuestionnaires: changedQuestionnaires, changedSurgeryDate:changedSurgeryDate});
+});
+
+
 router.post('/getUserQuestionnaireByCategory', async function(req, res) {
   const user1 = await User.find({UserID: req.UserID,})
   let idQuestionnairesArr =[]
