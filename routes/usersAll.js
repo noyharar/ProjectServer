@@ -279,7 +279,8 @@ router.post('/patientUpdateAndroid', async function (req, res) {
       user.BirthDate = (new Date(req.body.BirthDate || user.BirthDate)).setHours(0, 0, 0, 0);
       user.DateOfSurgery = req.body.DateOfSurgery;
       user.Type = ["patient"];
-      user.ValidTime = req.body.ValidTime || user.ValidTime;
+      user.changedSurgeryDate = req.body.changedSurgeryDate || user.changedSurgeryDate;
+      user.changedQuestionnaires = req.body.changedQuestionnaires || user.changedQuestionnaires;
       user.Timestamp = new Date().getTime();
       await User.updateUser(user, function (error) {
         if(error)
