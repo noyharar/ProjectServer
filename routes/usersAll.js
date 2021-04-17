@@ -102,19 +102,31 @@ router.post('/changeUserQuestionnaire', async function(req, res) {
     questionnairesArr.push(eq5);
     questionnairesArr.push(eq6);
   }
-  else
+  else {
     userid = req.body.UserID;
+    await User.updateOne({UserID: userid}, {changedQuestionnaires : req.body.changedQuestionnaires}, function (err, user) {
+      if (err)
+        common(res, err, err.message, null);
+      else {
+        if (user)
+          common(res, false, null, user.DateOfSurgery);
+        else
+          common(res, false, "Not Found", null);
+      }
+    });
+  }
   await User.updateOne({UserID: userid}, {Questionnaires: questionnairesArr}, function (err, user) {
-    if(err)
+    if (err)
       common(res, err, err.message, null);
     else {
-      if(user)
-        common(res, false, null, user.Questionnaires);
+      if (user)
+        common(res, false, null, user.DateOfSurgery);
       else
         common(res, false, "Not Found", null);
     }
   });
 });
+
 
 router.get('/getDateOfSurgery', async function(req, res) {
   var userid = "";
