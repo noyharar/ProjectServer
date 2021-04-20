@@ -1,12 +1,8 @@
 
-let express = require('express');
+
 let StepsMetric = require('./Metrics').StepsMetric;
 let DistanceMetric = require('./Metrics').DistanceMetric;
 let CaloriesMetric = require('./Metrics').CaloriesMetric;
-let SleepMetric = require('./Metrics').SleepMetric;
-let AccelerometerMetric = require('./Metrics').AccelerometerMetric;
-let WeatherMetric = require('./Metrics').WeatherMetric;
-let ActivityMetric = require('./Metrics').ActivityMetric;
 let User = require('./User');
 let Group = require('./Group');
 
@@ -17,71 +13,74 @@ module.exports.calculateGroupsData=async function () {
   //  var realNow =1585413706123;
    // var start = 1585413706160;
     let groups= await Group.getAllGroups();
-    for (let i=0; i<groups.length;i++){
-        let users=await findAllUsersIdsInGroup(groups[i]);
-        let ids=[];
-        for (let j=0;j<users.length;j++){
+    for (let i=0; i<groups.length;i++) {
+        let users = await findAllUsersIdsInGroup(groups[i]);
+        let ids = [];
+        for (let j = 0; j < users.length; j++) {
             ids.push(users[j].UserID);
         }
+        if (ids.length > 0) {
             //distance
             let docsDistance = await DistanceMetric.find({
                 UserID: {$in: ids},
-                ValidTime: {$gte: realNow, $lte:start}
+                ValidTime: {$gte: realNow, $lte: start}
+            }).lean().exec();
+            if (docsDistance.length > 0) {
+                let averageDistance = findAverage(docsDistance);
+                let newMetricDistance = new DistanceMetric({
+                    UserID: groups[i].groupId,
+                    Timestamp: realNow,
+                    ValidTime: start,
+                    Data: averageDistance
+                });
+
+                await newMetricDistance.save(function (err, metric) {
+                    if (err) return console.error(err);
+                    console.log(metric.UserID + " group saved in collection.");
+                });
+            }
+            //steps
+            let docsSteps = await StepsMetric.find({
+                UserID: {$in: ids},
+                ValidTime: {$gte: realNow, $lte: start}
             }).lean().exec();
 
-            let averageDistance=findAverage(docsDistance);
-            let newMetricDistance = new DistanceMetric({
-            UserID: groups[i].groupId,
-            Timestamp: realNow,
-            ValidTime: start,
-            Data: averageDistance
-        });
+            if (docsSteps.length > 0) {
+                let averageSteps = findAverage(docsSteps);
+                let newMetricSteps = new StepsMetric({
+                    UserID: groups[i].groupId,
+                    Timestamp: realNow,
+                    ValidTime: start,
+                    Data: averageSteps
+                });
 
-        await newMetricDistance.save(function (err, metric) {
-            if (err) return console.error(err);
-            console.log(metric.UserID+" group saved in collection.");
-        });
+                await newMetricSteps.save(function (err, metric) {
+                    if (err) return console.error(err);
+                    console.log(metric.UserID + " group saved in collection.");
+                });
+            }
+            //Calories
+            let docsCalories = await CaloriesMetric.find({
+                UserID: {$in: ids},
+                ValidTime: {$gte: realNow, $lte: start}
+            }).lean().exec();
+            if (docsCalories.length > 0) {
+                let averageCalories = findAverage(docsCalories);
+                let newMetricCalories = new CaloriesMetric({
+                    UserID: groups[i].groupId,
+                    Timestamp: realNow,
+                    ValidTime: start,
+                    Data: averageCalories
+                });
 
-        //steps
-        let docsSteps = await StepsMetric.find({
-            UserID: {$in: ids},
-            ValidTime: {$gte: realNow, $lte:start}
-        }).lean().exec();
+                await newMetricCalories.save(function (err, metric) {
+                    if (err) return console.error(err);
+                    console.log(metric.UserID + " group saved in collection.");
+                });
 
-        let averageSteps=findAverage(docsSteps);
-        let newMetricSteps = new StepsMetric({
-            UserID: groups[i].groupId,
-            Timestamp: realNow,
-            ValidTime: start,
-            Data: averageSteps
-        });
-
-        await newMetricSteps.save(function (err, metric) {
-            if (err) return console.error(err);
-            console.log(metric.UserID+" group saved in collection.");
-        });
-
-        //Calories
-        let docsCalories = await CaloriesMetric.find({
-            UserID: {$in: ids},
-            ValidTime: {$gte: realNow, $lte:start}
-        }).lean().exec();
-
-        let averageCalories=findAverage(docsCalories);
-        let newMetricCalories = new CaloriesMetric({
-            UserID: groups[i].groupId,
-            Timestamp: realNow,
-            ValidTime: start,
-            Data: averageCalories
-        });
-
-        await newMetricCalories.save(function (err, metric) {
-            if (err) return console.error(err);
-            console.log(metric.UserID+" group saved in collection.");
-        });
-
-
+            }
         }
+    }
     }
 
 async function findAllUsersIdsInGroup(group){
@@ -107,13 +106,36 @@ async function findAllUsersIdsInGroup(group){
 
         if (isBeforeSurgery)
         return await User.find( {BMI_NUMBER: {$gte: parseFloat(min), $lte:parseFloat(max)},"DateOfSurgery":{$gte:new Date().getTime()}});
-        else
-            return await User.find( {BMI_NUMBER: {$gte: parseFloat(min), $lte:parseFloat(max)},"DateOfSurgery":{$lt:new Date().getTime()}});
+        else{
+            let daysAfter=findHowManyDaysAfter(group.groupId);
+            if (daysAfter[0]=="") //in case after 180 days +
+                return await User.find( {BMI_NUMBER: {$gte: parseFloat(min), $lte:parseFloat(max)},"DateOfSurgery":{$lt:new Date().getTime()-daysAfter[1]*24*60*60*1000 }});
+            else
+            return await User.find( {BMI_NUMBER: {$gte: parseFloat(min), $lte:parseFloat(max)},"DateOfSurgery":{$lt:new Date().getTime()-daysAfter[0]*24*60*60*1000,$gt:new Date().getTime()-daysAfter[1]*24*60*60*1000 }});
+
+        }
     }
+
     if (isBeforeSurgery)
     return await User.find({"DateOfSurgery":{$gte:new Date().getTime()},[filterName]:[filterValue]}).lean().exec();
-    else
-        return await User.find({"DateOfSurgery":{$lt:new Date().getTime()},[filterName]:[filterValue]}).lean().exec();
+    else{
+        let daysAfter=findHowManyDaysAfter(group.groupId);
+        if (daysAfter[0]=="") //in case after 180 days +
+            return await User.find({"DateOfSurgery":{$lt:new Date().getTime()-daysAfter[1]*24*60*60*1000},[filterName]:[filterValue]}).lean().exec();
+        else
+        return await User.find({"DateOfSurgery":{$lt:new Date().getTime()-daysAfter[0]*24*60*60*1000,$gt:new Date().getTime()-daysAfter[1]*24*60*60*1000 },[filterName]:[filterValue]}).lean().exec();
+
+    }
+}
+
+function findHowManyDaysAfter(groupId) {
+    let range=  groupId.substring(
+        groupId.indexOf("/") + 1,
+        groupId.lastIndexOf("/")
+    );
+    let min=range.substr(0,range.indexOf('-'));
+    let max=range.substring(range.indexOf('-')+1);
+    return [min,max];
 }
 
 function findAverage(docs){
