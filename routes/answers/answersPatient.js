@@ -66,6 +66,14 @@ router.get('/getLastDaily', async function(req, res){
     });
 });
 
+router.post('/getLastPeriodicByQuestionnaire', async function(req, res){
+    let userid = req.UserID;
+    let questionnaireId = req.body.QuestionnaireID;
+    await PeriodicAnswer.findOne({UserID:  userid ,QuestionnaireID: questionnaireId}).lean().sort({ ValidTime: -1 }).exec(function (err, docs) {
+        common(res, err, err, docs.ValidTime);
+    });
+});
+
 
 router.post('/sendAnswers', async function (req, res, next) {
     if(req.body.QuestionnaireID==0) {
