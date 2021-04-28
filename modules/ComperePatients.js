@@ -97,7 +97,7 @@ async function findAllUsersIdsInGroup(group){
              {
                  min=40;
                  if (isBeforeSurgery)
-                     return await User.find( {BMI_NUMBER: {$gte: parseFloat(min)},"DateOfSurgery":{$gte:new Date().getTime()}});
+                     return await User.find( {BMI_NUMBER: {$gte: parseFloat(min)},$or: [{"DateOfSurgery":{$gte:new Date().getTime()}},{"DateOfSurgery":{$eq:0}}]});
                  else
                      return await User.find( {BMI_NUMBER: {$gte: parseFloat(min)},"DateOfSurgery":{$lt:new Date().getTime()}});
              }
@@ -105,11 +105,11 @@ async function findAllUsersIdsInGroup(group){
 
 
         if (isBeforeSurgery)
-        return await User.find( {BMI_NUMBER: {$gte: parseFloat(min), $lte:parseFloat(max)},"DateOfSurgery":{$gte:new Date().getTime()}});
+        return await User.find( {BMI_NUMBER: {$gte: parseFloat(min), $lte:parseFloat(max)},$or: [{"DateOfSurgery":{$gte:new Date().getTime()}},{"DateOfSurgery":{$eq:0}}]});
         else{
             let daysAfter=findHowManyDaysAfter(group.groupId);
             if (daysAfter[0]=="") //in case after 180 days +
-                return await User.find( {BMI_NUMBER: {$gte: parseFloat(min), $lte:parseFloat(max)},"DateOfSurgery":{$lt:new Date().getTime()-daysAfter[1]*24*60*60*1000 }});
+                return await User.find( {BMI_NUMBER: {$gte: parseFloat(min), $lte:parseFloat(max)},"DateOfSurgery":{$lt:new Date().getTime()-daysAfter[1]*24*60*60*1000,$gt:0}});
             else
             return await User.find( {BMI_NUMBER: {$gte: parseFloat(min), $lte:parseFloat(max)},"DateOfSurgery":{$lt:new Date().getTime()-daysAfter[0]*24*60*60*1000,$gt:new Date().getTime()-daysAfter[1]*24*60*60*1000 }});
 
@@ -117,11 +117,11 @@ async function findAllUsersIdsInGroup(group){
     }
 
     if (isBeforeSurgery)
-    return await User.find({"DateOfSurgery":{$gte:new Date().getTime()},[filterName]:[filterValue]}).lean().exec();
+    return await User.find({[filterName]:[filterValue], $or: [{"DateOfSurgery":{$gte:new Date().getTime()}},{"DateOfSurgery":{$eq:0}}]}).lean().exec();
     else{
         let daysAfter=findHowManyDaysAfter(group.groupId);
         if (daysAfter[0]=="") //in case after 180 days +
-            return await User.find({"DateOfSurgery":{$lt:new Date().getTime()-daysAfter[1]*24*60*60*1000},[filterName]:[filterValue]}).lean().exec();
+            return await User.find({"DateOfSurgery":{$lt:new Date().getTime()-daysAfter[1]*24*60*60*1000,$gt:0},[filterName]:[filterValue]}).lean().exec();
         else
         return await User.find({"DateOfSurgery":{$lt:new Date().getTime()-daysAfter[0]*24*60*60*1000,$gt:new Date().getTime()-daysAfter[1]*24*60*60*1000 },[filterName]:[filterValue]}).lean().exec();
 
