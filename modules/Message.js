@@ -45,11 +45,11 @@ module.exports.removeMessage = async function(messageId, callback){
     var query = {MessageId: messageId};
     await Message.deleteOne(query, callback);
 };
-
-module.exports.updateMessage = async function(messageId, newContent ,callback){
-    var query = {MessageId: messageId, Content: newContent};
-    await Message.updateOne(query, callback);
-};
+//
+// module.exports.updateMessage = async function(messageId, newContent ,callback){
+//     var query = {MessageId: messageId, Content: newContent};
+//     await Message.updateOne(query, callback);
+// };
 
 
 
