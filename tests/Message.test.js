@@ -21,7 +21,7 @@ globals.afterAll(async () => await dbHandler.closeDatabase());
 /**
  * Exercise test suite.
  */
-globals.describe('Exercise tests ', () => {
+globals.describe('Message tests ', () => {
 
     globals.it('Create exercise', (done) => {
         const messageToCreate = new Message({
