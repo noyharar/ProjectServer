@@ -27,10 +27,10 @@ beforeAll(async (done) => {
         First_Name: "First_Name",
         Last_Name: "Last_Name",
         Phone_Number: "Phone_Number",
-        Gender: "Gender",
-        Smoke: "Smoke",
-        SurgeryType: "SurgeryType",
-        Education: "Education",
+        Gender: "נקבה",
+        Smoke: "מעשן",
+        SurgeryType: "ניתוח מתוכנן",
+        Education: "6-9 שנות לימוד",
         Height: 120,
         Weight: 55,
         BMI: "100",
@@ -46,6 +46,8 @@ beforeAll(async (done) => {
         changedSurgeryDate: false,
         changedQuestionnaires: false
     });
+    console.log(newUser.UserID)
+    console.log(newUser.Password)
     User.createUser(newUser, () => {
         request.post('/users/login')
             .send({UserID: "UserID", Password: "Password"})
@@ -76,7 +78,10 @@ describe('tests', () => {
                .set('x-auth-token', token)
                .query(query)
                .then(res => {
-                   expect(res).toBeTruthy();
+                   let obj = JSON.parse(res.text)
+                   expect(obj.data[0].docs[0].UserID).toEqual(userIdHash);
+                   expect(obj.data[0].docs[0].Data).toEqual(100);
+                   expect(obj.data[0].docs[0].Timestamp).toEqual(1585687850376);
                    done();
                });
        });

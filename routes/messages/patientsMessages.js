@@ -48,14 +48,15 @@ router.post('/removeMessage', async function (req, res) {
       common(res, true, err, null);
       return;
     }
-    await Message.removeMessage(req.body.MessageId, function (err, message) {
-      if (err)
-        common(res, true, err, null);
-      else
-        common(res, false, null, {
-          messageId: message.MessageId
-        });
-    });
+    if(req.body.MessageId){
+      await Message.removeMessage(req.body.MessageId, function (err, message) {
+        if (err)
+          common(res, true, err, null);
+        else
+          common(res, false, null, {
+            messageId: message.MessageId
+          });
+      });}
   });
 });
 
