@@ -58,7 +58,7 @@ beforeAll(async (done) => {
 });
 
 describe('tests', () => {
-   it('expect', (done) => {
+   it('Get steps', (done) => {
        let newMetric = new StepsMetric({
            UserID: userIdHash,
            Timestamp: 1585687850376,
