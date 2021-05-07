@@ -57,6 +57,17 @@ router.get('/getUserQuestionnaire', async function(req, res) {
   });
 });
 
+//check
+router.get('/getChangeWithSurgeryOrQuestionnaires', async function(req, res) {
+  // let  status_array = []
+  const user1 = await User.find({UserID: req.UserID,})
+  let changedQuestionnaires = user1[0].changedQuestionnaires;
+  let changedSurgeryDate = user1[0].changedSurgeryDate;
+  // status_array.push(changedQuestionnaires)
+  // status_array.push(changedSurgeryDate)
+  common(res, false, null, {changedQuestionnaires: changedQuestionnaires, changedSurgeryDate:changedSurgeryDate});
+});
+
 
 router.post('/getUserQuestionnaireByCategory', async function(req, res) {
   const user1 = await User.find({UserID: req.UserID,})
@@ -278,9 +289,10 @@ router.post('/patientUpdateAndroid', async function (req, res) {
       user.Weight = req.body.Weight || user.Weight;
       user.BMI = req.body.BMI || user.BMI;
       user.BirthDate = (new Date(req.body.BirthDate || user.BirthDate)).setHours(0, 0, 0, 0);
-      user.DateOfSurgery = req.body.DateOfSurgery;
+      // user.DateOfSurgery = req.body.DateOfSurgery;
       user.Type = ["patient"];
-      user.ValidTime = req.body.ValidTime || user.ValidTime;
+      user.changedSurgeryDate = req.body.changedSurgeryDate || user.changedSurgeryDate;
+      user.changedQuestionnaires = req.body.changedQuestionnaires || user.changedQuestionnaires;
       user.Timestamp = new Date().getTime();
       await User.updateUser(user, function (error) {
         if(error)
