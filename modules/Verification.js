@@ -9,10 +9,13 @@ var VerificationSchema = new Schema({
     QuestionText: String
 });
 
-
-
 //create models
 var Verification = module.exports = mongoose.model('Verification', VerificationSchema, 'Verification');
+
+module.exports.createVerification= function(newVerification, callback){
+    //console.log(newUser);
+    newVerification.save(callback);
+};
 
 
 module.exports.getOneVerification = function(qid, callback){

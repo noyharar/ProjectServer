@@ -56,7 +56,8 @@ var mongoose = require('mongoose');
 //var mongoDB = "mongodb+srv://shtaro:turAYR3011@cluster0-lk8r9.mongodb.net/test?retryWrites=true&w=majority";
 var mongoDB = "mongodb://localhost:27017/modamedicDB";
 var mongoNoyUrl = "mongodb+srv://noyharari:noyharari@cluster0.vldcb.mongodb.net/modamedicDB?retryWrites=true&w=majority";
-mongoose.connect(mongoNoyUrl,  { useNewUrlParser: true });
+var finalUri = process.env.MONGO_URL || mongoNoyUrl;
+mongoose.connect(finalUri,  { useNewUrlParser: true });
 // Get Mongoose to use the global promise library
 mongoose.Promise = global.Promise;
 //Get the default connection

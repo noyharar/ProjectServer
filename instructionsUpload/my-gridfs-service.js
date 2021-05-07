@@ -57,7 +57,7 @@ const deleteFile = id => {
 };
 
 const storage = new GridFsStorage({
-    url: dbPath,
+    url: process.env.MONGO_URL || dbPath,
     cache: true,
     options: { useUnifiedTopology: true },
     file: (req, file) => {

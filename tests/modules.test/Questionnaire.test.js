@@ -1,28 +1,28 @@
 const mongoose = require('mongoose');
-const dbHandler = require('./db-handler');
-const Questionnaire = require('../modules/Questionnaire');
-const globals = require("@jest/globals");
+const dbHandler = require('../db-handler');
+const Questionnaire = require('../../modules/Questionnaire');
+const {beforeAll, it, afterAll, afterEach, expect, describe} = require("@jest/globals");
 
 /**
  * Connect to a new in-memory database before running any tests.
  */
-globals.beforeAll(async () => await dbHandler.connect());
+beforeAll(async () => await dbHandler.connect());
 
 /**
  * Clear all test data after every test.
  */
-globals.afterEach(async () => await dbHandler.clearDatabase());
+afterEach(async () => await dbHandler.clearDatabase());
 
 /**
  * Remove and close the db and server.
  */
-globals.afterAll(async () => await dbHandler.closeDatabase());
+afterAll(async () => await dbHandler.closeDatabase());
 
 /**
  * Exercise test suite.
  */
-globals.describe('Questionnaire tests ', () => {
-    globals.it('Get questionnaire - exists questionnaire', (done) => {
+describe('Questionnaire tests ', () => {
+    it('Get questionnaire - exists questionnaire', (done) => {
         const questionnaireToCreate = new Questionnaire({
             QuestionnaireID : 0,
             QuestionnaireText : "יומי",
@@ -108,22 +108,22 @@ globals.describe('Questionnaire tests ', () => {
         });
 
         Questionnaire.createQuestionnaire(questionnaireToCreate, (err, createdQuestionnaire) => {
-            globals.expect(err).toBeNull();
-            globals.expect(createdQuestionnaire.QuestionnaireID).toEqual(0);
-            globals.expect(createdQuestionnaire.QuestionnaireText).toEqual("יומי");
+            expect(err).toBeNull();
+            expect(createdQuestionnaire.QuestionnaireID).toEqual(0);
+            expect(createdQuestionnaire.QuestionnaireText).toEqual("יומי");
             Questionnaire.getQuestionnaire("0",(err, questionaire) => {
-                globals.expect(err).toBeNull();
-                globals.expect(questionaire.QuestionnaireID).toEqual(0);
+                expect(err).toBeNull();
+                expect(questionaire.QuestionnaireID).toEqual(0);
                 done();
             });
         });
     });
 
 
-    globals.it('Get questionnaire - not exists questionnaire', (done) => {
+    it('Get questionnaire - not exists questionnaire', (done) => {
         Questionnaire.getQuestionnaire("0",(err, questionaire) => {
-            globals.expect(err).toBeNull();
-            globals.expect(questionaire).toBeNull();
+            expect(err).toBeNull();
+            expect(questionaire).toBeNull();
             done();
         });
     });

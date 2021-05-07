@@ -1,6 +1,5 @@
 const mongoose = require('mongoose');
 const { MongoMemoryServer } = require('mongodb-memory-server');
-
 const mongod = new MongoMemoryServer();
 
 /**
@@ -8,16 +7,15 @@ const mongod = new MongoMemoryServer();
  */
 module.exports.connect = async () => {
     const uri = await mongod.getConnectionString();
-
+    process.env.MONGO_URL = uri;
     const mongooseOpts = {
         useNewUrlParser: true,
         autoReconnect: true,
         reconnectTries: Number.MAX_VALUE,
         reconnectInterval: 1000
     };
-
     await mongoose.connect(uri, mongooseOpts);
-}
+};
 
 /**
  * Drop database, close the connection and stop mongod.
