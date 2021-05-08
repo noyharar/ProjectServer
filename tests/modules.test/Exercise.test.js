@@ -38,6 +38,31 @@ describe('Exercise tests ', () => {
         };
         Exercise.createExercise(exerciseToCreate, callback);
     });
+
+    it('Create extra Exercise with same ID', (done) => {
+        const newExercise = new Exercise({
+            ExerciseId: "ExerciseId",
+            Category: "Category",
+            Video : "Video"
+        });
+        const newExerciseSecond = new Exercise({
+            ExerciseId: "ExerciseId",
+            Category: "Category",
+            Video : "Video"
+        });
+
+        const callback = (err, createdExercise) => {
+            expect(err).toBeNull();
+            expect(createdExercise.ExerciseId).toEqual("ExerciseId");
+            expect(createdExercise.Category).toEqual("Category");
+            expect(createdExercise.Video).toEqual("Video");
+            Exercise .createExercise(newExerciseSecond, (err,createdExerciseSecond) => {
+                expect(createdExerciseSecond).toBeUndefined()
+                done();
+            });
+        };
+        Exercise.createExercise(newExercise, callback);
+    });
     it('Get exercises', (done) => {
         const exerciseToCreate = new Exercise({
             ExerciseId: "ExerciseId",

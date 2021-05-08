@@ -5,7 +5,9 @@ var mongoose = require('mongoose');
 var Schema = mongoose.Schema;
 
 var VerificationSchema = new Schema({
-    QuestionID: Number,
+    QuestionID: {type:Number,
+        unique:true
+    },
     QuestionText: String
 });
 

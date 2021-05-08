@@ -36,6 +36,28 @@ describe('Verification tests ', () => {
         };
         Verification.createVerification(verificationToCreate, callback);
     });
+    it('Create verification same ID', (done) => {
+        const verificationToCreate = new Verification({
+            QuestionID: 0,
+            QuestionText: "QuestionText"
+        });
+        const verificationToCreateSecond = new Verification({
+            QuestionID: 0,
+            QuestionText: "QuestionText"
+        });
+        const callback = (err, createdVerification) => {
+            expect(err).toBeNull();
+            expect(createdVerification.QuestionID).toEqual(0);
+            expect(createdVerification.QuestionText).toEqual("QuestionText");
+            Verification.createVerification(verificationToCreateSecond, (err,createdExerciseSecond) => {
+                expect(createdExerciseSecond).toBeUndefined()
+            done();
+            });
+        };
+        Verification.createVerification(verificationToCreate, callback);
+    });
+
+
     it('Get one verification', (done) => {
         const verificationToCreate = new Verification({
             QuestionID: 0,

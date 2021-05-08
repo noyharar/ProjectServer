@@ -76,6 +76,90 @@ describe('User tests ', () => {
         User.createUser(newUser, callback);
     });
 
+
+    it('Create extra User with same ID', (done) => {
+        const newUser = new User({
+            UserID: "UserID",
+            Password: service.hashElement("Password"),
+            First_Name: "First_Name",
+            Last_Name: "Last_Name",
+            Phone_Number: "Phone_Number",
+            Gender: "Gender",
+            Smoke: "Smoke",
+            SurgeryType: "SurgeryType",
+            Education: "Education",
+            Height: 120,
+            Weight: 55,
+            BMI: "100",
+            BMI_NUMBER: 100,
+            BirthDate: 1620139890041,
+            Type: ["patient"],
+            DateOfSurgery: 1620139890041,
+            Questionnaires: [],
+            VerificationQuestion: 1,
+            VerificationAnswer: 2,
+            ValidTime: 1620139890041,
+            Timestamp: new Date().getTime(),
+            changedSurgeryDate: false,
+            changedQuestionnaires: false
+        });
+        const newUserSecond = new User({
+            UserID: "UserID",
+            Password: service.hashElement("Password"),
+            First_Name: "First_Name",
+            Last_Name: "Last_Name",
+            Phone_Number: "Phone_Number",
+            Gender: "Gender",
+            Smoke: "Smoke",
+            SurgeryType: "SurgeryType",
+            Education: "Education",
+            Height: 120,
+            Weight: 55,
+            BMI: "100",
+            BMI_NUMBER: 100,
+            BirthDate: 1620139890041,
+            Type: ["patient"],
+            DateOfSurgery: 1620139890041,
+            Questionnaires: [],
+            VerificationQuestion: 1,
+            VerificationAnswer: 2,
+            ValidTime: 1620139890041,
+            Timestamp: new Date().getTime(),
+            changedSurgeryDate: false,
+            changedQuestionnaires: false
+        });
+        const callback = (err, createdUser) => {
+            expect(err).toBeNull();
+            expect(createdUser.UserID).toEqual("UserID");
+            expect(createdUser.Password).toEqual(service.hashElement("Password"));
+            expect(createdUser.First_Name).toEqual("First_Name");
+            expect(createdUser.Last_Name).toEqual("Last_Name");
+            expect(createdUser.Phone_Number).toEqual("Phone_Number");
+            expect(createdUser.Gender).toEqual("Gender");
+            expect(createdUser.Smoke).toEqual("Smoke");
+            expect(createdUser.SurgeryType).toEqual("SurgeryType");
+            expect(createdUser.Education).toEqual("Education");
+            expect(createdUser.Height).toEqual(120);
+            expect(createdUser.Weight).toEqual(55);
+            expect(createdUser.BMI_NUMBER).toEqual(100);
+            expect(createdUser.BMI).toEqual("100");
+            expect(createdUser.BirthDate).toEqual(1620139890041);
+            expect(createdUser.Type[0]).toEqual("patient");
+            expect(createdUser.DateOfSurgery).toEqual(1620139890041);
+            expect(createdUser.Questionnaires.length).toEqual(0);
+            expect(createdUser.VerificationQuestion).toEqual(1);
+            expect(createdUser.VerificationAnswer).toEqual("2");
+            expect(createdUser.ValidTime).toEqual(1620139890041);
+            User.createUser(newUserSecond, (err,createdUserSecond) => {
+                expect(createdUserSecond).toBeUndefined()
+                done();
+            });
+        };
+        User.createUser(newUser, callback);
+    });
+
+
+
     it('Get User By UserID - exists user', (done) => {
         const newUser = new User({
             UserID: "UserID",
