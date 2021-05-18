@@ -123,15 +123,13 @@ function forceMidnightGroupsDataCalculations(hour,minute) {
 }
 let comperePatients =require('./modules/ComperePatients');
 //get your offset to wait value
-var timetarget = forceMidnightGroupsDataCalculations(3,28).getTime();
-var timenow =  new Date().getTime();
-var offsetmilliseconds = timetarget - timenow;
+var cron = require('node-cron');
 
-//if it isn't midnight yet, set a timeout.
-if (offsetmilliseconds >= 0){
-  setTimeout(function(){comperePatients.calculateGroupsData().then(r => console.log("finish midnight calculations for patients compere"));}, offsetmilliseconds);
-}
 
+
+cron.schedule('00 04 09 * * *', () => {
+  comperePatients.calculateGroupsData().then(r => console.log("finish midnight calculations for patients compere"));
+});
 
 
 module.exports = app;

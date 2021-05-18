@@ -8,14 +8,15 @@ let Group = require('./Group');
 
 //http://localhost:8180/auth/doctors/comperePatients/getDistanceCompere?start_time=150000000000&end_time=1685413707000&filter="BMI"&groupId=BMI 18.5-25
 module.exports.calculateGroupsData=async function () {
-   var realNow = new Date().setHours(-48,0,0,0);
+    console.log("enter calculateGroupsData");
+   var realNow = new Date().setHours(0,0,0,0);
     var start = new Date().setHours(-24,0,0,0);
   //  var realNow =1585413706123;
    // var start = 1585413706160;
     let groups= await Group.getAllGroups();
     for (let i=0; i<groups.length;i++) {
         let users = await findAllUsersIdsInGroup(groups[i]);
-        let ids = [];
+        let ids =[];
         for (let j = 0; j < users.length; j++) {
             ids.push(users[j].UserID);
         }
@@ -23,7 +24,7 @@ module.exports.calculateGroupsData=async function () {
             //distance
             let docsDistance = await DistanceMetric.find({
                 UserID: {$in: ids},
-                ValidTime: {$gte: realNow, $lte: start}
+                ValidTime: {$gte: start, $lte: realNow}
             }).lean().exec();
             if (docsDistance.length > 0) {
                 let averageDistance = findAverage(docsDistance);
@@ -42,7 +43,7 @@ module.exports.calculateGroupsData=async function () {
             //steps
             let docsSteps = await StepsMetric.find({
                 UserID: {$in: ids},
-                ValidTime: {$gte: realNow, $lte: start}
+                ValidTime: {$gte: start, $lte: realNow}
             }).lean().exec();
 
             if (docsSteps.length > 0) {
@@ -62,7 +63,7 @@ module.exports.calculateGroupsData=async function () {
             //Calories
             let docsCalories = await CaloriesMetric.find({
                 UserID: {$in: ids},
-                ValidTime: {$gte: realNow, $lte: start}
+                ValidTime: {$gte: start, $lte: realNow}
             }).lean().exec();
             if (docsCalories.length > 0) {
                 let averageCalories = findAverage(docsCalories);
@@ -84,6 +85,7 @@ module.exports.calculateGroupsData=async function () {
     }
 
 async function findAllUsersIdsInGroup(group){
+    console.log("enter findAllUsersIdsInGroup");
     let isBeforeSurgery;
     if (group.groupId.endsWith("Before")) isBeforeSurgery=true;
     else isBeforeSurgery=false;
@@ -139,6 +141,7 @@ function findHowManyDaysAfter(groupId) {
 }
 
 function findAverage(docs){
+    console.log("enter findAverage");
     if (docs.length==0) return 0;
     let sum=0;
     for (let i=0;i<docs.length;i++)
