@@ -70,7 +70,9 @@ router.post('/patientRegister', async function (req, res) {
           VerificationQuestion: req.body.VerificationQuestion,
           VerificationAnswer: req.body.VerificationAnswer,
           ValidTime: req.body.ValidTime,
-          Timestamp: new Date().getTime()
+          Timestamp: new Date().getTime(),
+          changedSurgeryDate: false,
+          changedQuestionnaires: false
         });
         await User.createUser(newUser, function (error, user) {
           if(error)

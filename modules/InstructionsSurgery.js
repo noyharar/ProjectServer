@@ -49,6 +49,10 @@ module.exports.getInstructionsSurgery = async function({}, callback){
     await InstructionsSurgery.find({}, callback);
 };
 
+module.exports.deleteInstruction = function(id, callback){
+    InstructionsSurgery.deleteOne({ InstructionId: id }, callback);
+};
+
 
 
 

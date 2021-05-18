@@ -38,6 +38,8 @@ var UserSchema = new Schema({
             ],
         default: undefined
     },
+    changedSurgeryDate: Boolean,
+    changedQuestionnaires: Boolean,
     ValidTime: Number,
     Timestamp: Number
 });
@@ -206,7 +208,6 @@ module.exports.editUser = function(user, field,val, callback){
         user.save(callback);
     }
 };
-
 
 module.exports.updateUser = function(user, callback){
     user.save(callback);

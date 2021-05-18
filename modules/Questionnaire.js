@@ -8,6 +8,7 @@ var QuestionnaireSchema = new Schema({
     QuestionnaireID: Number,
     QuestionnaireText: String,
     QuestionnaireEnglishText: String,
+    Category: String,
     Questions: [
         {
             QuestionID: Number,
@@ -40,6 +41,11 @@ module.exports.getQuestionnaire = function(qid, callback){
     var query = {QuestionnaireID: qid};
     Questionnaire.findOne(query, callback);
 };
+module.exports.createQuestionnaire = function(newQuestionnaire, callback){
+    //console.log(newUser);
+    newQuestionnaire.save(callback);
+};
+
 
 
 

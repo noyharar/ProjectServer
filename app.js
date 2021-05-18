@@ -22,6 +22,7 @@ var doctorMessagesRouter = require('./routes/messages/doctorsMessages');
 var instructionsSurgeryRouter = require('./routes/instructions/doctorsInstructions');
 var exercisesDoctorRouter = require('./routes/exercises/doctorsExercises');
 var compereByDoctorRouter = require('./routes/comperePatients/compereByDoctor');
+const { onOpen, onError } = require("./instructionsUpload/my-gridfs-service");
 
 var app = express();
 var cors = require('cors');
@@ -55,20 +56,25 @@ var mongoose = require('mongoose');
 //var mongoDB = "mongodb+srv://shtaro:turAYR3011@cluster0-lk8r9.mongodb.net/test?retryWrites=true&w=majority";
 var mongoDB = "mongodb://localhost:27017/modamedicDB";
 var mongoNoyUrl = "mongodb+srv://noyharari:noyharari@cluster0.vldcb.mongodb.net/modamedicDB?retryWrites=true&w=majority";
-mongoose.connect(mongoNoyUrl,  { useNewUrlParser: true });
+var finalUri = process.env.MONGO_URL || mongoNoyUrl;
+mongoose.connect(finalUri,  { useNewUrlParser: true });
 // Get Mongoose to use the global promise library
 mongoose.Promise = global.Promise;
 //Get the default connection
-var db = mongoose.connection;
+const db = mongoose.connection;
 db.once('open', function (err) {
   if (!err) {
     console.log("connected to mongo db");
+    onOpen(db.db);
   }
   else
     console.log("failed");
 });
 //Bind connection to error event (to get notification of connection errors)
-db.on('error', console.error.bind(console, 'MongoDB connection error:'));
+db.on('error', function () {
+  console.error.bind(console, 'MongoDB connection error:');
+  onError();
+});
 
 // view engine setup
 app.set('views', path.join(__dirname, 'views'));

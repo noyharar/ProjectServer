@@ -1,11 +1,14 @@
 var express = require('express');
 var router = express.Router();
 var User = require('../modules/User');
+var Questionnaire = require('../modules/Questionnaire');
 var common = require('./common');
 var jwt = require('jsonwebtoken');
 var tempToken = "password";
 var Exercise = require('../modules/Exercise');
 var Instruction = require('../modules/InstructionsSurgery');
+const { createGridFSReadStream, getGridFSFiles } = require("../instructionsUpload/my-gridfs-service");
+const asyncWrapper = require("../instructionsUpload/async-wrapper");
 
 
 router.get('/getFirsts', async function(req, res) {
@@ -54,6 +57,41 @@ router.get('/getUserQuestionnaire', async function(req, res) {
   });
 });
 
+//check
+router.get('/getChangeWithSurgeryOrQuestionnaires', async function(req, res) {
+  // let  status_array = []
+  const user1 = await User.find({UserID: req.UserID,})
+  let changedQuestionnaires = user1[0].changedQuestionnaires;
+  let changedSurgeryDate = user1[0].changedSurgeryDate;
+  // status_array.push(changedQuestionnaires)
+  // status_array.push(changedSurgeryDate)
+  common(res, false, null, {changedQuestionnaires: changedQuestionnaires, changedSurgeryDate:changedSurgeryDate});
+});
+
+
+router.post('/getUserQuestionnaireByCategory', async function(req, res) {
+  const user1 = await User.find({UserID: req.UserID,})
+  let idQuestionnairesArr =[]
+  let titles_arr = []
+  let num_questionnaires = user1[0].Questionnaires.length;
+  let category = req.body.Category;
+  let i;
+  let j;
+  for (i = 0; i < num_questionnaires; i++) {
+      idQuestionnairesArr.push(user1[0].Questionnaires[i]['_doc'].QuestionnaireID)
+  }
+  for (j = 0; j < idQuestionnairesArr.length; j++) {
+    const question = await Questionnaire.find({QuestionnaireID: idQuestionnairesArr[j],})
+    let question_category = question[0]['_doc'].Category
+    if (category === question_category){
+      let question_title = question[0]['_doc'].QuestionnaireText
+      titles_arr.push(question_title)
+    }
+  }
+  common(res, false, null, titles_arr);
+});
+
+
 router.post('/changeUserQuestionnaire', async function(req, res) {
   let daily = {QuestionnaireID: 0, QuestionnaireText: "יומי"};
   let questionnairesArr = [daily];
@@ -75,19 +113,31 @@ router.post('/changeUserQuestionnaire', async function(req, res) {
     questionnairesArr.push(eq5);
     questionnairesArr.push(eq6);
   }
-  else
+  else {
     userid = req.body.UserID;
+    await User.updateOne({UserID: userid}, {changedQuestionnaires : req.body.changedQuestionnaires}, function (err, user) {
+      if (err)
+        common(res, err, err.message, null);
+      else {
+        if (user)
+          common(res, false, null, user.DateOfSurgery);
+        else
+          common(res, false, "Not Found", null);
+      }
+    });
+  }
   await User.updateOne({UserID: userid}, {Questionnaires: questionnairesArr}, function (err, user) {
-    if(err)
+    if (err)
       common(res, err, err.message, null);
     else {
-      if(user)
-        common(res, false, null, user.Questionnaires);
+      if (user)
+        common(res, false, null, user.DateOfSurgery);
       else
         common(res, false, "Not Found", null);
     }
   });
 });
+
 
 router.get('/getDateOfSurgery', async function(req, res) {
   var userid = "";
@@ -111,18 +161,29 @@ router.post('/changeDateOfSurgery', async function(req, res) {
   var userid = "";
   if(req.Type.includes("patient"))
     userid = req.UserID;
-  else
+  else {
     userid = req.body.UserID;
-  await User.updateOne({UserID: userid}, {DateOfSurgery: req.body.DateOfSurgery}, function (err, user) {
-    if(err)
-      common(res, err, err.message, null);
-    else {
-      if(user)
-        common(res, false, null, user.DateOfSurgery);
-      else
-        common(res, false, "Not Found", null);
-    }
-  });
+    await User.updateOne({UserID: userid}, {changedSurgeryDate: req.body.changedSurgeryDate}, function (err, user) {
+      if (err)
+        common(res, err, err.message, null);
+      else {
+        if (user)
+          common(res, false, null, user.DateOfSurgery);
+        else
+          common(res, false, "Not Found", null);
+      }
+    });
+  }
+    await User.updateOne({UserID: userid}, {DateOfSurgery: req.body.DateOfSurgery}, function (err, user) {
+      if (err)
+        common(res, err, err.message, null);
+      else {
+        if (user)
+          common(res, false, null, user.DateOfSurgery);
+        else
+          common(res, false, "Not Found", null);
+      }
+    });
 });
 
 
@@ -143,9 +204,10 @@ router.post('/askChangePassword', async function (req, res) {
   });
 });
 
+
 router.get('/userInfo', async function(req, res) {
   var userid = "";
-    userid = req.UserID;
+  userid = req.UserID;
   let userObj = await User.findOne({UserID: req.UserID}).lean().exec();
 
   await User.getUserByUserID(userid, function (err, user) {
@@ -181,36 +243,70 @@ router.post('/changeUserInfo', async function(req, res) {
 
 
 router.put('/patientUpdate', async function (req, res) {
-    await User.getUserByUserID(req.UserID, async function (err, user) {
-      if (user) {
-        user.UserID = req.body.UserID || user.UserID;
-        user.First_Name = req.body.First_Name || user.First_Name;
-        user.Last_Name = req.body.Last_Name || user.Last_Name;
-        user.Phone_Number = req.body.Phone_Number || user.Phone_Number;
-        user.Gender = req.body.Gender || user.Gender;
-        user.Smoke = req.body.Smoke || user.Smoke;
-        user.SurgeryType = req.body.SurgeryType || user.SurgeryType;
-        user.Education = req.body.Education || user.Education;
-        user.Height = req.body.Height || user.Height;
-        user.Weight = req.body.Weight || user.Weight;
-        user.BMI = req.body.BMI || user.BMI;
-        user.BirthDate = (new Date(req.body.BirthDate || user.BirthDate)).setHours(0, 0, 0, 0);
-        user.DateOfSurgery = req.body.DateOfSurgery;
-        user.Type = ["patient"];
-        user.ValidTime = req.body.ValidTime || user.ValidTime;
-        user.Timestamp = new Date().getTime();
-        await User.updateUser(user, function (error) {
-          if(error)
-            common(res, error, error, null);
-          else
-            common(res,false,null,user);
-        });
-      } else {
-        var error = {'message': 'Taken Email'};
-        common(res, error, error, null);
-      }
-    });
+  await User.getUserByUserID(req.UserID, async function (err, user) {
+    if (user) {
+      user.UserID = req.body.UserID || user.UserID;
+      user.First_Name = req.body.First_Name || user.First_Name;
+      user.Last_Name = req.body.Last_Name || user.Last_Name;
+      user.Phone_Number = req.body.Phone_Number || user.Phone_Number;
+      user.Gender = req.body.Gender || user.Gender;
+      user.Smoke = req.body.Smoke || user.Smoke;
+      user.SurgeryType = req.body.SurgeryType || user.SurgeryType;
+      user.Education = req.body.Education || user.Education;
+      user.Height = req.body.Height || user.Height;
+      user.Weight = req.body.Weight || user.Weight;
+      user.BMI = req.body.BMI || user.BMI;
+      user.BirthDate = (new Date(req.body.BirthDate || user.BirthDate)).setHours(0, 0, 0, 0);
+      user.DateOfSurgery = req.body.DateOfSurgery;
+      user.Type = ["patient"];
+      user.ValidTime = req.body.ValidTime || user.ValidTime;
+      user.Timestamp = new Date().getTime();
+      await User.updateUser(user, function (error) {
+        if(error)
+          common(res, error, error, null);
+        else
+          common(res,false,null,user);
+      });
+    } else {
+      var error = {'message': 'Taken Email'};
+      common(res, error, error, null);
+    }
+  });
 });
+
+router.post('/patientUpdateAndroid', async function (req, res) {
+  await User.getUserByUserID(req.UserID, async function (err, user) {
+    if (user) {
+      user.UserID = req.body.UserID || user.UserID;
+      user.First_Name = req.body.First_Name || user.First_Name;
+      user.Last_Name = req.body.Last_Name || user.Last_Name;
+      user.Phone_Number = req.body.Phone_Number || user.Phone_Number;
+      user.Gender = req.body.Gender || user.Gender;
+      user.Smoke = req.body.Smoke || user.Smoke;
+      user.SurgeryType = req.body.SurgeryType || user.SurgeryType;
+      user.Education = req.body.Education || user.Education;
+      user.Height = req.body.Height || user.Height;
+      user.Weight = req.body.Weight || user.Weight;
+      user.BMI = req.body.BMI || user.BMI;
+      user.BirthDate = (new Date(req.body.BirthDate || user.BirthDate)).setHours(0, 0, 0, 0);
+      // user.DateOfSurgery = req.body.DateOfSurgery;
+      user.Type = ["patient"];
+      user.changedSurgeryDate = req.body.changedSurgeryDate || user.changedSurgeryDate;
+      user.changedQuestionnaires = req.body.changedQuestionnaires || user.changedQuestionnaires;
+      user.Timestamp = new Date().getTime();
+      await User.updateUser(user, function (error) {
+        if(error)
+          common(res, error, error, null);
+        else
+          common(res,false,null,user);
+      });
+    } else {
+      var error = {'message': 'Taken Email'};
+      common(res, error, error, null);
+    }
+  });
+});
+
 
 router.put('/doctorUpdate', async function (req, res) {
   await User.getUserByUserID(req.UserID, async function (err, user) {
@@ -253,5 +349,21 @@ router.get('/instructions', async function (req, res) {
       common(res, false, null, instruction);
   });
 });
+
+router.get(
+    "/instructions/:id",
+    asyncWrapper(async (req, res) => {
+      const instruction = await getGridFSFiles(req.params.id);
+      if (!instruction) {
+        let err = { message: "Instruction not found" };
+        common(res, err, err, null);
+        return;
+      }
+      res.setHeader('Content-disposition', 'attachment; filename=' + instruction.filename);
+      res.setHeader("content-type", instruction.contentType);
+      const readStream = createGridFSReadStream(req.params.id);
+      readStream.pipe(res);
+    })
+);
 
 module.exports = router;
