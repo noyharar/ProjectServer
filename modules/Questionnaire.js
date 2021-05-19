@@ -41,6 +41,11 @@ module.exports.getQuestionnaire = function(qid, callback){
     var query = {QuestionnaireID: qid};
     Questionnaire.findOne(query, callback);
 };
+module.exports.createQuestionnaire = function(newQuestionnaire, callback){
+    //console.log(newUser);
+    newQuestionnaire.save(callback);
+};
+
 
 
 

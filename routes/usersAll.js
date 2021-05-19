@@ -289,7 +289,7 @@ router.post('/patientUpdateAndroid', async function (req, res) {
       user.Weight = req.body.Weight || user.Weight;
       user.BMI = req.body.BMI || user.BMI;
       user.BirthDate = (new Date(req.body.BirthDate || user.BirthDate)).setHours(0, 0, 0, 0);
-      user.DateOfSurgery = req.body.DateOfSurgery;
+      // user.DateOfSurgery = req.body.DateOfSurgery;
       user.Type = ["patient"];
       user.changedSurgeryDate = req.body.changedSurgeryDate || user.changedSurgeryDate;
       user.changedQuestionnaires = req.body.changedQuestionnaires || user.changedQuestionnaires;

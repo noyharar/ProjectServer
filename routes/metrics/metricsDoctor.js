@@ -49,8 +49,7 @@ router.get('/getSteps', async function (req, res, next) {
     }
     req.query.start_time = parseFloat(req.query.start_time);
     req.query.end_time = parseFloat(req.query.end_time);
-    console.log(req.query.start_time)
-    console.log(req.query.end_time)
+
     let ans = [];
     if (req.query.UserID) {
         let user = await User.findOne({UserID: req.query.UserID}).lean().exec();

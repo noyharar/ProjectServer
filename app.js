@@ -56,7 +56,8 @@ var mongoose = require('mongoose');
 //var mongoDB = "mongodb+srv://shtaro:turAYR3011@cluster0-lk8r9.mongodb.net/test?retryWrites=true&w=majority";
 var mongoDB = "mongodb://localhost:27017/modamedicDB";
 var mongoNoyUrl = "mongodb+srv://noyharari:noyharari@cluster0.vldcb.mongodb.net/modamedicDB?retryWrites=true&w=majority";
-mongoose.connect(mongoNoyUrl,  { useNewUrlParser: true });
+var finalUri = process.env.MONGO_URL || mongoNoyUrl;
+mongoose.connect(finalUri,  { useNewUrlParser: true });
 // Get Mongoose to use the global promise library
 mongoose.Promise = global.Promise;
 //Get the default connection
@@ -128,15 +129,13 @@ function forceMidnightGroupsDataCalculations(hour,minute) {
 }
 let comperePatients =require('./modules/ComperePatients');
 //get your offset to wait value
-var timetarget = forceMidnightGroupsDataCalculations(3,28).getTime();
-var timenow =  new Date().getTime();
-var offsetmilliseconds = timetarget - timenow;
+var cron = require('node-cron');
 
-//if it isn't midnight yet, set a timeout.
-if (offsetmilliseconds >= 0){
-  setTimeout(function(){comperePatients.calculateGroupsData().then(r => console.log("finish midnight calculations for patients compere"));}, offsetmilliseconds);
-}
 
+
+cron.schedule('00 04 09 * * *', () => {
+  comperePatients.calculateGroupsData().then(r => console.log("finish midnight calculations for patients compere"));
+});
 
 
 module.exports = app;
