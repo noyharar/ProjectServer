@@ -28,8 +28,8 @@ router.post('/', async function (req, res) {
       To: req.UserID,
       Content: req.body.content,
       Date: new Date().getTime(),
-      FromFirstName: user.First_Name,
-      FromLastName: user.Last_Name
+      FromFirstName: user.First_Name || user._doc.First_Name,
+      FromLastName: user.Last_Name || user._doc.Last_Name
     });
     await Message.createMessage(newMessage, function (err, message) {
       if (err)
