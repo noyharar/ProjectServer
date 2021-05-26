@@ -1,7 +1,9 @@
 var express = require('express');
 var router = express.Router();
 var User = require('../modules/User');
-var Questionnaire = require('../modules/Questionnaire');
+// var Questionnaire = require('../modules/Questionnaire');
+var Questionnaire = require('../modules/Questionnaire').Questionnaire;
+var QuestionnaireEnglish = require('../modules/Questionnaire').QuestionnaireEnglish;
 var common = require('./common');
 var jwt = require('jsonwebtoken');
 var tempToken = "password";
@@ -57,6 +59,57 @@ router.get('/getUserQuestionnaire', async function(req, res) {
   });
 });
 
+router.get('/getUserQuestionnaire/:Language', async function(req, res) {
+  let lang = req.params.Language;
+
+  var userid = "";
+  if (req.Type.includes("patient"))
+    userid = req.UserID;
+  else
+    userid = req.query.UserID;
+  if (lang === 'he' || lang === 'iw') {
+  await User.getUserByUserID(userid, function (err, user) {
+    if (err)
+      common(res, true, err, null);
+    else {
+      if (user)
+        common(res, false, null, user.Questionnaires);
+      else
+        common(res, false, "Not Found", null);
+    }
+  });
+  }
+  else{
+    await User.getUserByUserID(userid, async function (err, user) {
+      let userQuestionnaires = user.Questionnaires
+      let i;
+      let j;
+      let data =[]
+
+      let idQuestionnairesUserArr =[]
+      for (i=0;i < userQuestionnaires.length; i++){
+        idQuestionnairesUserArr.push(userQuestionnaires[i]['_doc'].QuestionnaireID)
+      }
+      for (j = 0; j < idQuestionnairesUserArr.length; j++) {
+        const question = await QuestionnaireEnglish.find({QuestionnaireID: idQuestionnairesUserArr[j],})
+        let question_text = question[0]['_doc'].QuestionnaireText
+        let ques = {QuestionnaireID: idQuestionnairesUserArr[j], QuestionnaireText: question_text}
+        data.push(ques)
+      }
+
+      if (err)
+        common(res, true, err, null);
+      else {
+        if (user)
+
+          common(res, false, null, data);
+        else
+          common(res, false, "Not Found", null);
+      }
+    });
+  }
+});
+
 //check
 router.get('/getChangeWithSurgeryOrQuestionnaires', async function(req, res) {
   // let  status_array = []
@@ -68,29 +121,111 @@ router.get('/getChangeWithSurgeryOrQuestionnaires', async function(req, res) {
   common(res, false, null, {changedQuestionnaires: changedQuestionnaires, changedSurgeryDate:changedSurgeryDate});
 });
 
+//****
+// router.post('/getUserQuestionnaireByCategory', async function(req, res) {
+//   const user1 = await User.find({UserID: req.UserID,})
+//   let idQuestionnairesArr =[]
+//   let titles_arr = []
+//   let num_questionnaires = user1[0].Questionnaires.length;
+//   let category = req.body.Category;
+//   let i;
+//   let j;
+//   for (i = 0; i < num_questionnaires; i++) {
+//       idQuestionnairesArr.push(user1[0].Questionnaires[i]['_doc'].QuestionnaireID)
+//   }
+//   for (j = 0; j < idQuestionnairesArr.length; j++) {
+//     const question = await Questionnaire.find({QuestionnaireID: idQuestionnairesArr[j],})
+//     let question_category = question[0]['_doc'].Category
+//     if (category === question_category){
+//       let question_title = question[0]['_doc'].QuestionnaireText
+//       titles_arr.push(question_title)
+//     }
+//   }
+//   common(res, false, null, titles_arr);
+// });
 
-router.post('/getUserQuestionnaireByCategory', async function(req, res) {
+
+router.get('/getUserQuestionnaireByCategory/:Category/:Language', async function(req, res) {
+  let lang = req.params.Language;
+  let category = req.params.Category;
   const user1 = await User.find({UserID: req.UserID,})
   let idQuestionnairesArr =[]
   let titles_arr = []
   let num_questionnaires = user1[0].Questionnaires.length;
-  let category = req.body.Category;
+
   let i;
   let j;
   for (i = 0; i < num_questionnaires; i++) {
-      idQuestionnairesArr.push(user1[0].Questionnaires[i]['_doc'].QuestionnaireID)
+    idQuestionnairesArr.push(user1[0].Questionnaires[i]['_doc'].QuestionnaireID)
   }
-  for (j = 0; j < idQuestionnairesArr.length; j++) {
-    const question = await Questionnaire.find({QuestionnaireID: idQuestionnairesArr[j],})
-    let question_category = question[0]['_doc'].Category
-    if (category === question_category){
-      let question_title = question[0]['_doc'].QuestionnaireText
-      titles_arr.push(question_title)
+  if (lang === 'he' || lang === 'iw') {
+    for (j = 0; j < idQuestionnairesArr.length; j++) {
+      const question = await Questionnaire.find({QuestionnaireID: idQuestionnairesArr[j],})
+      let question_category = question[0]['_doc'].Category
+      if (category === question_category) {
+        let question_title = question[0]['_doc'].QuestionnaireText
+        titles_arr.push(question_title)
+      }
+    }
+  }
+  else {
+    for (j = 0; j < idQuestionnairesArr.length; j++) {
+      const question = await QuestionnaireEnglish.find({QuestionnaireID: idQuestionnairesArr[j],})
+      let question_category = question[0]['_doc'].Category
+      if (category === question_category) {
+        let question_title = question[0]['_doc'].QuestionnaireText
+        titles_arr.push(question_title)
+      }
     }
   }
   common(res, false, null, titles_arr);
 });
 
+// router.post('/changeUserQuestionnaire', async function(req, res) {
+//   let daily = {QuestionnaireID: 0, QuestionnaireText: "יומי"};
+//   let questionnairesArr = [daily];
+//   let Questionnaires = req.body.Questionnaires;
+//   if(Questionnaires.length>0){
+//     for await (const q of Questionnaires){
+//       if(q.QuestionnaireID==5){
+//         let eq6 = {QuestionnaireID: 6, QuestionnaireText: "דירוג איכות חיים"};
+//         questionnairesArr.push(eq6);
+//       }
+//       questionnairesArr.push(q);
+//     }
+//   }
+//   var userid = "";
+//   if(req.Type.includes("patient")){
+//     userid = req.UserID;
+//     let eq5 = {QuestionnaireID: 5, QuestionnaireText: "איכות חיים"};
+//     let eq6 = {QuestionnaireID: 6, QuestionnaireText: "דירוג איכות חיים"};
+//     questionnairesArr.push(eq5);
+//     questionnairesArr.push(eq6);
+//   }
+//   else {
+//     userid = req.body.UserID;
+//     await User.updateOne({UserID: userid}, {changedQuestionnaires : req.body.changedQuestionnaires}, function (err, user) {
+//       if (err)
+//         common(res, err, err.message, null);
+//       else {
+//         if (user)
+//           common(res, false, null, user.DateOfSurgery);
+//         else
+//           common(res, false, "Not Found", null);
+//       }
+//     });
+//   }
+//   await User.updateOne({UserID: userid}, {Questionnaires: questionnairesArr}, function (err, user) {
+//     if (err)
+//       common(res, err, err.message, null);
+//     else {
+//       if (user)
+//         common(res, false, null, user.DateOfSurgery);
+//       else
+//         common(res, false, "Not Found", null);
+//     }
+//   });
+// });
 
 router.post('/changeUserQuestionnaire', async function(req, res) {
   let daily = {QuestionnaireID: 0, QuestionnaireText: "יומי"};
@@ -100,20 +235,15 @@ router.post('/changeUserQuestionnaire', async function(req, res) {
     for await (const q of Questionnaires){
       if(q.QuestionnaireID==5){
         let eq6 = {QuestionnaireID: 6, QuestionnaireText: "דירוג איכות חיים"};
-        questionnairesArr.push(eq6);
+        if (!Questionnaires.some(questionnaire => questionnaire.QuestionnaireID === eq6.QuestionnaireID)) {
+          questionnairesArr.push(eq6);
+        }
       }
       questionnairesArr.push(q);
     }
   }
-  var userid = "";
-  if(req.Type.includes("patient")){
-    userid = req.UserID;
-    let eq5 = {QuestionnaireID: 5, QuestionnaireText: "איכות חיים"};
-    let eq6 = {QuestionnaireID: 6, QuestionnaireText: "דירוג איכות חיים"};
-    questionnairesArr.push(eq5);
-    questionnairesArr.push(eq6);
-  }
-  else {
+  var userid = req.UserID;
+  if(req.Type.includes("doctor")){
     userid = req.body.UserID;
     await User.updateOne({UserID: userid}, {changedQuestionnaires : req.body.changedQuestionnaires}, function (err, user) {
       if (err)

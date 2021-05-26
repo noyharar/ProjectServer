@@ -6,7 +6,8 @@ var jwt = require('jsonwebtoken');
 var service = require('../service');
 var secret="secret";
 var tempToken="password";
-var Verification = require('../modules/Verification');
+var Verification = require('../modules/Verification').Verification;
+var VerificationEnglish = require('../modules/Verification').VerificationEnglish;
 const StepsMetric = require('../modules/Metrics').StepsMetric;
 const DistanceMetric = require('../modules/Metrics').DistanceMetric;
 const CaloriesMetric = require('../modules/Metrics').CaloriesMetric;
@@ -26,10 +27,38 @@ router.get('/getVerifications', async function(req, res){
   });
 });
 
+router.get('/getVerifications/:Language', async function(req, res){
+  let lang = req.params.Language;
+  if (lang === 'he' || lang === 'iw') {
+    await Verification.getAllVerification(function (err, questions) {
+      common(res, err, err, questions);
+    });
+  }
+  else{
+    await VerificationEnglish.getAllVerification(function (err, questions) {
+      common(res, err, err, questions);
+    });
+  }
+});
+
 router.get('/getVerificationQuestion', async function(req, res){
   await Verification.getOneVerification( req.query.QuestionID, function(err, question){
     common(res, err, err, question);
   });
+});
+
+router.get('/getVerificationQuestion/:Language', async function(req, res){
+  let lang = req.params.Language;
+  if (lang === 'he' || lang === 'iw') {
+    await Verification.getOneVerification(req.query.QuestionID, function (err, question) {
+      common(res, err, err, question);
+    });
+  }
+  else {
+    await VerificationEnglish.getAllVerification(function (err, questions) {
+      common(res, err, err, questions);
+    });
+  }
 });
 
 

@@ -33,19 +33,37 @@ var QuestionnaireSchema = new Schema({
 
 
 
+// //create models
+// var Questionnaire = module.exports = mongoose.model('Questionnaire', QuestionnaireSchema, 'Questionnaire');
+
 //create models
-var Questionnaire = module.exports = mongoose.model('Questionnaire', QuestionnaireSchema, 'Questionnaire');
+var Questionnaire = module.exports.Questionnaire = mongoose.model('Questionnaire', QuestionnaireSchema, 'Questionnaire');
+var QuestionnaireEnglish = module.exports.QuestionnaireEnglish = mongoose.model('QuestionnaireEnglish', QuestionnaireSchema, 'QuestionnaireEnglish');
 
+// module.exports.getQuestionnaire = function(qid, callback){
+//     var query = {QuestionnaireID: qid};
+//     Questionnaire.findOne(query, callback);
+// };
+// module.exports.createQuestionnaire = function(newQuestionnaire, callback){
+//     //console.log(newUser);
+//     newQuestionnaire.save(callback);
 
-module.exports.getQuestionnaire = function(qid, callback){
+module.exports.Questionnaire.getQuestionnaire = function(qid, callback){
     var query = {QuestionnaireID: qid};
     Questionnaire.findOne(query, callback);
 };
-module.exports.createQuestionnaire = function(newQuestionnaire, callback){
+module.exports.Questionnaire.createQuestionnaire = function(newQuestionnaire, callback){
     //console.log(newUser);
     newQuestionnaire.save(callback);
 };
 
+module.exports.QuestionnaireEnglish.getQuestionnaireEnglish = function(qid, callback){
+    var query = {QuestionnaireID: qid};
+    QuestionnaireEnglish.findOne(query, callback);
+};
 
-
+module.exports.QuestionnaireEnglish.createQuestionnaireEnglish = function(newQuestionnaire, callback){
+    //console.log(newUser);
+    newQuestionnaire.save(callback);
+};
 
