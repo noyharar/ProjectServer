@@ -55,7 +55,7 @@ router.get('/getVerificationQuestion/:Language', async function(req, res){
     });
   }
   else {
-    await VerificationEnglish.getAllVerification(function (err, questions) {
+    await VerificationEnglish.getOneVerificationEnglish(req.query.QuestionID,function (err, questions) {
       common(res, err, err, questions);
     });
   }

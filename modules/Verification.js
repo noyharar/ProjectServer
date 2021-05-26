@@ -36,7 +36,7 @@ module.exports.Verification.createVerification= function(newVerification, callba
 };
 
 //eng
-module.exports.VerificationEnglish.getOneVerification = function(qid, callback){
+module.exports.VerificationEnglish.getOneVerificationEnglish = function(qid, callback){
     var query = {QuestionID: qid};
     VerificationEnglish.findOne(query, callback);
 };
