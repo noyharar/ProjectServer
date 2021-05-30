@@ -12,19 +12,40 @@ var VerificationSchema = new Schema({
 });
 
 //create models
-var Verification = module.exports = mongoose.model('Verification', VerificationSchema, 'Verification');
+var Verification = module.exports.Verification = mongoose.model('Verification', VerificationSchema, 'Verification');
+var VerificationEnglish = module.exports.VerificationEnglish = mongoose.model('VerificationEnglish', VerificationSchema, 'VerificationEnglish');
 
-module.exports.createVerification= function(newVerification, callback){
+module.exports.Verification.createVerification= function(newVerification, callback){
     //console.log(newUser);
     newVerification.save(callback);
 };
 
-
-module.exports.getOneVerification = function(qid, callback){
+//heb
+module.exports.Verification.getOneVerification = function(qid, callback){
     var query = {QuestionID: qid};
     Verification.findOne(query, callback);
 };
 
-module.exports.getAllVerification = function(callback){
+module.exports.Verification.getAllVerification = function(callback){
     Verification.find({}, callback);
+};
+
+module.exports.Verification.createVerification= function(newVerification, callback){
+    //console.log(newUser);
+    newVerification.save(callback);
+};
+
+//eng
+module.exports.VerificationEnglish.getOneVerificationEnglish = function(qid, callback){
+    var query = {QuestionID: qid};
+    VerificationEnglish.findOne(query, callback);
+};
+
+module.exports.VerificationEnglish.getAllVerification = function(callback){
+    VerificationEnglish.find({}, callback);
+};
+
+module.exports.VerificationEnglish.createVerification= function(newVerification, callback){
+    //console.log(newUser);
+    newVerification.save(callback);
 };
