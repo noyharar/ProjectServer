@@ -90,12 +90,77 @@ describe('tests metrics', () => {
             ValidTime: '1585687872508',
             Data: 100
         });
+        let newMetric2 = new StepsMetric({
+            UserID: patientIdHash,
+            Timestamp: '1585687850376',
+            ValidTime: '1585687872508',
+            Data: 101
+        });
+        newMetric2.save(function (error) {
+            newMetric.save(function (error) {
+                expect(error).toBeNull();
+                const query = {
+                    UserID: patientIdHash,
+                    start_time: '1577836800000',
+                    end_time: '1596326400000'
+                };
+                request.get('/auth/doctors/metrics/getSteps')
+                    .set('Content-Type', 'application/json')
+                    .set('x-auth-token', token)
+                    .query(query)
+                    .then(res => {
+                        let obj = JSON.parse(res.text)
+                        expect(obj.data[0].docs[0].UserID).toEqual(patientIdHash);
+                        expect(obj.data[0].docs[0].Data).toEqual(101);
+                        expect(obj.data[0].docs[0].Timestamp).toEqual(1585687850376);
+                        done();
+                    });
+            });
+        });
+    })
+
+    it('Get steps - undifind start time', (done) => {
+        let newMetric = new StepsMetric({
+            UserID: patientIdHash,
+            Timestamp: '1585687850376',
+            ValidTime: '1585687872508',
+            Data: 100
+        });
+        newMetric.save(function (error) {
+            expect(error).toBeNull();
+            const query = {
+                UserID: patientIdHash,
+                start_time: undefined,
+                end_time: '1596326400000'
+            };
+            request.get('/auth/doctors/metrics/getSteps')
+                .set('Content-Type', 'application/json')
+                .set('x-auth-token', token)
+                .query(query)
+                .then(res => {
+                    let obj = JSON.parse(res.text)
+                    expect(obj.data[0].docs[0].UserID).toEqual(patientIdHash);
+                    expect(obj.data[0].docs[0].Data).toEqual(100);
+                    expect(obj.data[0].docs[0].Timestamp).toEqual(1585687850376);
+                    done();
+                });
+        });
+    })
+
+    it('Get steps - undifind end time', (done) => {
+        let newMetric = new StepsMetric({
+            UserID: patientIdHash,
+            Timestamp: '1585687850376',
+            ValidTime: '1585687872508',
+            Data: 100
+        });
         newMetric.save(function (error) {
             expect(error).toBeNull();
             const query = {
                 UserID: patientIdHash,
                 start_time: '1577836800000',
-                end_time: '1596326400000'
+                // end_time: '1596326400000'
+                end_time: undefined
             };
             request.get('/auth/doctors/metrics/getSteps')
                 .set('Content-Type', 'application/json')
@@ -144,6 +209,74 @@ describe('tests metrics', () => {
                 });
         });
     })
+    it('Get sleep undifind end time', (done) => {
+        let newMetric = new SleepMetric({
+            UserID: patientIdHash,
+            Timestamp: '1585687850376',
+            ValidTime: '1585687872508',
+            Data: [{
+                StartTime: 1620489253000,
+                EndTime: 1620489257000,
+                State: "SLEEP_LIGHT"
+            }]
+        });
+        newMetric.save(function (error) {
+            expect(error).toBeNull();
+            const query = {
+                start_time: '1577836800000',
+                end_time: undefined,
+                UserID: patientIdHash
+            };
+            request.get('/auth/doctors/metrics/getSleep')
+                .set('Content-Type', 'application/json')
+                .set('x-auth-token', token)
+                .query(query)
+                .then(res => {
+                    let obj = JSON.parse(res.text)
+                    console.log(res.text)
+                    expect(obj.data[0].docs[0].UserID).toEqual(patientIdHash);
+                    expect(obj.data[0].docs[0].Data[0].State).toEqual("SLEEP_LIGHT");
+                    expect(obj.data[0].docs[0].Data[0].StartTime).toEqual(1620489253000);
+                    expect(obj.data[0].docs[0].Data[0].EndTime).toEqual(1620489257000);
+                    expect(obj.data[0].docs[0].Timestamp).toEqual(1585687850376);
+                    done();
+                });
+        });
+    })
+    it('Get sleep - start time undifind', (done) => {
+        let newMetric = new SleepMetric({
+            UserID: patientIdHash,
+            Timestamp: '1585687850376',
+            ValidTime: '1585687872508',
+            Data: [{
+                StartTime: 1620489253000,
+                EndTime: 1620489257000,
+                State: "SLEEP_LIGHT"
+            }]
+        });
+        newMetric.save(function (error) {
+            expect(error).toBeNull();
+            const query = {
+                start_time: undefined,
+                end_time: '1620575661000',
+                UserID: patientIdHash
+            };
+            request.get('/auth/doctors/metrics/getSleep')
+                .set('Content-Type', 'application/json')
+                .set('x-auth-token', token)
+                .query(query)
+                .then(res => {
+                    let obj = JSON.parse(res.text)
+                    console.log(res.text)
+                    expect(obj.data[0].docs[0].UserID).toEqual(patientIdHash);
+                    expect(obj.data[0].docs[0].Data[0].State).toEqual("SLEEP_LIGHT");
+                    expect(obj.data[0].docs[0].Data[0].StartTime).toEqual(1620489253000);
+                    expect(obj.data[0].docs[0].Data[0].EndTime).toEqual(1620489257000);
+                    expect(obj.data[0].docs[0].Timestamp).toEqual(1585687850376);
+                    done();
+                });
+        });
+    })
     it('Get distance', (done) => {
         let newMetric = new DistanceMetric({
             UserID: patientIdHash,
@@ -156,6 +289,60 @@ describe('tests metrics', () => {
             const query = {
                 start_time: '1577836800000',
                 end_time: '1596326400000',
+                UserID: patientIdHash
+            };
+            request.get('/auth/doctors/metrics/getDistance')
+                .set('Content-Type', 'application/json')
+                .set('x-auth-token', token)
+                .query(query)
+                .then(res => {
+                    let obj = JSON.parse(res.text)
+                    expect(obj.data[0].docs[0].UserID).toEqual(patientIdHash);
+                    expect(obj.data[0].docs[0].Data).toEqual(100);
+                    expect(obj.data[0].docs[0].Timestamp).toEqual(1585687850376);
+                    done();
+                });
+        });
+    })
+    it('Get distance - undefind start time', (done) => {
+        let newMetric = new DistanceMetric({
+            UserID: patientIdHash,
+            Timestamp: '1585687850376',
+            ValidTime: '1585687872508',
+            Data: 100
+        });
+        newMetric.save(function (error) {
+            expect(error).toBeNull();
+            const query = {
+                start_time: undefined,
+                end_time: '1596326400000',
+                UserID: patientIdHash
+            };
+            request.get('/auth/doctors/metrics/getDistance')
+                .set('Content-Type', 'application/json')
+                .set('x-auth-token', token)
+                .query(query)
+                .then(res => {
+                    let obj = JSON.parse(res.text)
+                    expect(obj.data[0].docs[0].UserID).toEqual(patientIdHash);
+                    expect(obj.data[0].docs[0].Data).toEqual(100);
+                    expect(obj.data[0].docs[0].Timestamp).toEqual(1585687850376);
+                    done();
+                });
+        });
+    })
+    it('Get distance - undefind end time', (done) => {
+        let newMetric = new DistanceMetric({
+            UserID: patientIdHash,
+            Timestamp: '1585687850376',
+            ValidTime: '1585687872508',
+            Data: 100
+        });
+        newMetric.save(function (error) {
+            expect(error).toBeNull();
+            const query = {
+                start_time: '1577836800000',
+                end_time: undefined,
                 UserID: patientIdHash
             };
             request.get('/auth/doctors/metrics/getDistance')
@@ -198,6 +385,62 @@ describe('tests metrics', () => {
                 });
         });
     })
+    it('Get calories - undefind start time', (done) => {
+        let newMetric = new CaloriesMetric({
+            UserID: patientIdHash,
+            Timestamp: '1585687850376',
+            ValidTime: '1585687872508',
+            Data: 100
+        });
+        newMetric.save(function (error) {
+            expect(error).toBeNull();
+            const query = {
+                start_time: undefined,
+                end_time: '1596326400000',
+                UserID: patientIdHash
+            };
+            request.get('/auth/doctors/metrics/getCalories')
+                .set('Content-Type', 'application/json')
+                .set('x-auth-token', token)
+                .query(query)
+                .then(res => {
+                    let obj = JSON.parse(res.text)
+                    expect(obj.data[0].docs[0].UserID).toEqual(patientIdHash);
+                    expect(obj.data[0].docs[0].Data).toEqual(100);
+                    expect(obj.data[0].docs[0].Timestamp).toEqual(1585687850376);
+                    done();
+                });
+        });
+    })
+    it('Get calories - undfind end time', (done) => {
+        let newMetric = new CaloriesMetric({
+            UserID: patientIdHash,
+            Timestamp: '1585687850376',
+            ValidTime: '1585687872508',
+            Data: 100
+        });
+        newMetric.save(function (error) {
+            expect(error).toBeNull();
+            const query = {
+                start_time: '1577836800000',
+                end_time: undefined,
+                UserID: patientIdHash
+            };
+            request.get('/auth/doctors/metrics/getCalories')
+                .set('Content-Type', 'application/json')
+                .set('x-auth-token', token)
+                .query(query)
+                .then(res => {
+                    let obj = JSON.parse(res.text)
+                    expect(obj.data[0].docs[0].UserID).toEqual(patientIdHash);
+                    expect(obj.data[0].docs[0].Data).toEqual(100);
+                    expect(obj.data[0].docs[0].Timestamp).toEqual(1585687850376);
+                    done();
+                });
+        });
+    })
+
+
     it('Get WeatherMetric', (done) => {
         let newMetric = new WeatherMetric({
             UserID: patientIdHash,
@@ -232,7 +475,178 @@ describe('tests metrics', () => {
                 });
         });
     })
+    it('Get WeatherMetric - undefined start time', (done) => {
+        let newMetric = new WeatherMetric({
+            UserID: patientIdHash,
+            Timestamp: '1585687850376',
+            ValidTime: '1585687872508',
+            Data: {
+                High: 30,
+                Low: 17,
+                Humidity: 20
+            }
+        });
+        newMetric.save(function (error) {
+            expect(error).toBeNull();
+            const query = {
+                start_time: undefined,
+                end_time: '1596326400000',
+                UserID: patientIdHash
+            };
+            request.get('/auth/doctors/metrics/getWeather')
+                .set('Content-Type', 'application/json')
+                .set('x-auth-token', token)
+                .query(query)
+                .then(res => {
+                    let obj = JSON.parse(res.text)
+                    console.log(obj)
+                    expect(obj.data[0].docs[0].UserID).toEqual(patientIdHash);
+                    expect(obj.data[0].docs[0].Data.High).toEqual(30);
+                    expect(obj.data[0].docs[0].Data.Low).toEqual(17);
+                    expect(obj.data[0].docs[0].Data.Humidity).toEqual(20);
+                    expect(obj.data[0].docs[0].Timestamp).toEqual(1585687850376);
+                    done();
+                });
+        });
+    })
+    it('Get WeatherMetric - undefined end time', (done) => {
+        let newMetric = new WeatherMetric({
+            UserID: patientIdHash,
+            Timestamp: '1585687850376',
+            ValidTime: '1585687872508',
+            Data: {
+                High: 30,
+                Low: 17,
+                Humidity: 20
+            }
+        });
+        newMetric.save(function (error) {
+            expect(error).toBeNull();
+            const query = {
+                start_time: '1577836800000',
+                end_time: undefined,
+                UserID: patientIdHash
+            };
+            request.get('/auth/doctors/metrics/getWeather')
+                .set('Content-Type', 'application/json')
+                .set('x-auth-token', token)
+                .query(query)
+                .then(res => {
+                    let obj = JSON.parse(res.text)
+                    console.log(obj)
+                    expect(obj.data[0].docs[0].UserID).toEqual(patientIdHash);
+                    expect(obj.data[0].docs[0].Data.High).toEqual(30);
+                    expect(obj.data[0].docs[0].Data.Low).toEqual(17);
+                    expect(obj.data[0].docs[0].Data.Humidity).toEqual(20);
+                    expect(obj.data[0].docs[0].Timestamp).toEqual(1585687850376);
+                    done();
+                });
+        });
+    })
+    it('Get activity', (done) => {
+        let newMetric = new ActivityMetric({
+            UserID: patientIdHash,
+            Timestamp: '1585687850376',
+            ValidTime: '1585687872508',
+            Data: [{
+                StartTime: 1577836800000,
+                EndTime: 1596326400000,
+                State: '100'
+            }]
+        });
+        newMetric.save(function (error) {
+            expect(error).toBeNull();
+            const query = {
+                start_time: '1577836800000',
+                end_time: '1596326400000',
+                UserID: patientIdHash
+            };
+            request.get('/auth/doctors/metrics/getActivity')
+                .set('Content-Type', 'application/json')
+                .set('x-auth-token', token)
+                .query(query)
+                .then(res => {
+                    let obj = JSON.parse(res.text)
+                    console.log(res.text)
+                    expect(obj.data[0].docs[0].UserID).toEqual(patientIdHash);
+                    expect(obj.data[0].docs[0].Data[0].EndTime).toEqual(1596326400000);
+                    expect(obj.data[0].docs[0].Data[0].StartTime).toEqual(1577836800000);
+                    expect(obj.data[0].docs[0].Data[0].State).toEqual("100");
+                    expect(obj.data[0].docs[0].Timestamp).toEqual(1585687850376);
+                    done();
+                });
+        });
+    })
+    it('Get activity - undefined start', (done) => {
+        let newMetric = new ActivityMetric({
+            UserID: patientIdHash,
+            Timestamp: '1585687850376',
+            ValidTime: '1585687872508',
+            Data: [{
+                StartTime: 1577836800000,
+                EndTime: 1596326400000,
+                State: '100'
+            }]
+        });
+        newMetric.save(function (error) {
+            expect(error).toBeNull();
+            const query = {
+                start_time: undefined,
+                end_time: '1596326400000',
+                UserID: patientIdHash
+            };
+            request.get('/auth/doctors/metrics/getActivity')
+                .set('Content-Type', 'application/json')
+                .set('x-auth-token', token)
+                .query(query)
+                .then(res => {
+                    let obj = JSON.parse(res.text)
+                    expect(obj.data[0].docs[0].UserID).toEqual(patientIdHash);
+                    expect(obj.data[0].docs[0].Data[0].EndTime).toEqual(1596326400000);
+                    expect(obj.data[0].docs[0].Data[0].StartTime).toEqual(1577836800000);
+                    expect(obj.data[0].docs[0].Data[0].State).toEqual('100');
+                    expect(obj.data[0].docs[0].Timestamp).toEqual(1585687850376);
+                    done();
+                });
+        });
+    })
+    it('Get activity- undefined end time', (done) => {
+        let newMetric = new ActivityMetric({
+            UserID: patientIdHash,
+            Timestamp: '1585687850376',
+            ValidTime: '1585687872508',
+            Data: [{
+                StartTime: 1577836800000,
+                EndTime: 1596326400000,
+                State: '100'
+            }]
+        });
+        newMetric.save(function (error) {
+            expect(error).toBeNull();
+            const query = {
+                start_time: '1577836800000',
+                end_time: undefined,
+                UserID: patientIdHash
+            };
+            request.get('/auth/doctors/metrics/getActivity')
+                .set('Content-Type', 'application/json')
+                .set('x-auth-token', token)
+                .query(query)
+                .then(res => {
+                    let obj = JSON.parse(res.text)
+                    console.log(res.text)
+                    expect(obj.data[0].docs[0].UserID).toEqual(patientIdHash);
+                    expect(obj.data[0].docs[0].Data[0].EndTime).toEqual(1596326400000);
+                    expect(obj.data[0].docs[0].Data[0].StartTime).toEqual(1577836800000);
+                    expect(obj.data[0].docs[0].Data[0].State).toEqual('100');
+                    expect(obj.data[0].docs[0].Timestamp).toEqual(1585687850376);
+                    done();
+                });
+        });
+    })
 });
+
+
 /**
  * Clear all test data after every test.
  */

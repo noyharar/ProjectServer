@@ -15,6 +15,11 @@ var PermissionSchema = new Schema({
 var Permission = module.exports = mongoose.model('Permission', PermissionSchema, 'Permission');
 
 
+module.exports.createPermission = function(newPermission, callback){
+    //console.log(newUser);
+    newPermission.save(callback);
+};
+
 module.exports.getOnePermission = function(doctorID, patientID, callback){
     var query = {DoctorID: doctorID, PatientID: patientID};
     Permission.findOne(query, callback);

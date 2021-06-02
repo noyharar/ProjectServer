@@ -1,6 +1,6 @@
 const mongoose = require('mongoose');
 const dbHandler = require('../db-handler');
-const Questionnaire = require('../../modules/Questionnaire');
+const Questionnaire = require('../../modules/Questionnaire').Questionnaire;
 const {beforeAll, it, afterAll, afterEach, expect, describe} = require("@jest/globals");
 
 /**
